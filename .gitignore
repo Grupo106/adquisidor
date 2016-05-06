@@ -31,3 +31,6 @@ bin/adquisidor
 
 # Debug files
 *.dSYM/
+
+# vim files
+*.sw[p-z]
