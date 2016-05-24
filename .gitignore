@@ -37,4 +37,3 @@
 # generated objects
 bin/
 build/
-src/db.c

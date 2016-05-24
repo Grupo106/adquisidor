@@ -22,7 +22,7 @@ int main()
     while(i--) insertar(&paquete);
     commit();
     /* Muestro lista de paquetes */
-    //listar();
+    listar();
     /* Desconecto base de datos */
     desconectar();
     return 0;
