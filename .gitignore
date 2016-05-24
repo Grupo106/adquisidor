@@ -27,10 +27,14 @@
 *.i*86
 *.x86_64
 *.hex
-bin/adquisidor
 
 # Debug files
 *.dSYM/
 
 # vim files
 *.sw[p-z]
+
+# generated objects
+bin/
+build/
+src/db.c

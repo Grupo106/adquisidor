@@ -1,0 +1,71 @@
+#include <string.h>
+#include "db.h"
+
+EXEC SQL BEGIN DECLARE SECTION;
+    char _src[15],
+         _dst[15];
+    int _src_port,
+        _dst_port,
+        _bytes;
+    const char *_insert_stmt = 
+    "INSERT INTO traffic (src, dst, src_port, dst_port, bytes) \
+     VALUES(?, ?, ?, ?, ?);";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL WHENEVER SQLERROR SQLPRINT;
+EXEC SQL WHENEVER SQLWARNING SQLPRINT;
+
+
+int conectar() {
+    //ECPGdebug(1, stderr);
+    EXEC SQL CONNECT TO postgres@172.17.0.2 USER postgres/root;
+    return sqlca.sqlcode;
+}
+
+void desconectar() {
+    EXEC SQL DISCONNECT ALL;
+}
+
+void insertar(t_paquete *paquete) {
+    /* Preparo sentencia insert */
+    EXEC SQL PREPARE _insert FROM :_insert_stmt;
+    /* Preparo parametros */
+    strcpy(_src, inet_ntoa(paquete->src));
+    strcpy(_dst, inet_ntoa(paquete->dst));
+    _src_port = paquete->src_port;
+    _dst_port = paquete->dst_port;
+    _bytes = paquete->bytes;
+    /* Ejecuto sentencia */
+    EXEC SQL EXECUTE _insert 
+         USING :_src, :_dst, :_src_port, :_dst_port, :_bytes;
+    //EXEC SQL COMMIT;
+    /* Libero recursos */
+    //EXEC SQL DEALLOCATE PREPARE _insert;
+}
+
+void commit() {
+    EXEC SQL COMMIT;
+}
+
+void listar() {
+    /* Preparo select */
+    EXEC SQL DECLARE _lista CURSOR FOR
+         SELECT src, dst, src_port, dst_port, bytes 
+         FROM traffic
+         ORDER BY id DESC
+         LIMIT 10;
+    /* Cuando no encuentra datos en el cursor, sale del ciclo */
+    EXEC SQL WHENEVER NOT FOUND DO BREAK;
+    /* Abro cursor */
+    EXEC SQL OPEN _lista;
+    /* Recorro resultados */
+    while(1) {
+        EXEC SQL FETCH FROM _lista 
+             INTO :_src, :_dst, :_src_port, :_dst_port, :_bytes;
+        printf("%s:%d -> %s:%d\t%d bytes\n", 
+                _src, _src_port, _dst, _dst_port, _bytes);
+    }
+    /* Cierro cursor */
+    EXEC SQL CLOSE _lista;
+    EXEC SQL COMMIT;
+}
