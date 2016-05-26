@@ -1,4 +1,4 @@
-/* vim: set ft=esqlc: */
+/* vim: set ft=c: */
 #include <assert.h>
 #include <string.h>
 #include "db.h"
