@@ -1,4 +1,4 @@
-PROGRAM = adquisidor
+PROGRAM = main
 SRC_DIR = ./src
 BUILD_DIR = ./build
 BIN_DIR = ./bin
@@ -6,9 +6,9 @@ BIN_DIR = ./bin
 ECPG = ecpg
 CC = gcc
 COMPILE_FLAGS = -Wall -Wextra -g -O2
-LINK_FLAGS = -lecpg
+LINK_FLAGS = -lecpg -lpcap
 
-all: dirs $(BIN_DIR)/$(PROGRAM)
+all: dirs $(BIN_DIR)/$(PROGRAM) $(BIN_DIR)/adquisidor
 
 $(BIN_DIR)/$(PROGRAM): $(BUILD_DIR)/main.o $(BUILD_DIR)/db.o
 	$(CC) $(LINK_FLAGS) -o $(BIN_DIR)/$(PROGRAM) $(BUILD_DIR)/db.o $(BUILD_DIR)/main.o
@@ -28,8 +28,8 @@ clean:
 
 #all: bin/adquisidor
 
-#bin/adquisidor: src/adquisidor.c
-#	gcc -o bin/adquisidor -lpcap src/adquisidor.c
+$(BIN_DIR)/adquisidor: $(SRC_DIR)/adquisidor.c
+	gcc $(COMPILE_FLAGS) $(LINK_FLAGS) -o $(BIN_DIR)/adquisidor $(SRC_DIR)/adquisidor.c
 
 #clean:
 #	rm -rf bin/adquisidor

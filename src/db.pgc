@@ -6,11 +6,11 @@
 EXEC SQL BEGIN DECLARE SECTION;
     char _src[15],
          _dst[15];
-    int _src_port,
-        _dst_port,
+    int _sport,
+        _dport,
         _bytes;
     const char *_insert_stmt = 
-    "INSERT INTO traffic (src, dst, src_port, dst_port, bytes) \
+    "INSERT INTO traffic (src, dst, sport, dport, bytes) \
      VALUES(?, ?, ?, ?, ?);";
 EXEC SQL END DECLARE SECTION;
 
@@ -35,12 +35,12 @@ void insertar(t_paquete *paquete) {
     /* Preparo parametros */
     strcpy(_src, inet_ntoa(paquete->src));
     strcpy(_dst, inet_ntoa(paquete->dst));
-    _src_port = paquete->src_port;
-    _dst_port = paquete->dst_port;
+    _sport = paquete->sport;
+    _dport = paquete->dport;
     _bytes = paquete->bytes;
     /* Ejecuto sentencia */
     EXEC SQL EXECUTE _insert 
-         USING :_src, :_dst, :_src_port, :_dst_port, :_bytes;
+         USING :_src, :_dst, :_sport, :_dport, :_bytes;
     //EXEC SQL COMMIT;
     /* Libero recursos */
     EXEC SQL DEALLOCATE PREPARE _insert;
@@ -53,7 +53,7 @@ void commit() {
 void listar() {
     /* Preparo select */
     EXEC SQL DECLARE _lista CURSOR FOR
-         SELECT src, dst, src_port, dst_port, bytes 
+         SELECT src, dst, sport, dport, bytes 
          FROM traffic
          ORDER BY id DESC
          LIMIT 10;
@@ -64,9 +64,9 @@ void listar() {
     /* Recorro resultados */
     while(1) {
         EXEC SQL FETCH FROM _lista 
-             INTO :_src, :_dst, :_src_port, :_dst_port, :_bytes;
+             INTO :_src, :_dst, :_sport, :_dport, :_bytes;
         printf("%s:%d -> %s:%d\t%d bytes\n", 
-                _src, _src_port, _dst, _dst_port, _bytes);
+                _src, _sport, _dst, _dport, _bytes);
     }
     /* Cierro cursor */
     EXEC SQL CLOSE _lista;

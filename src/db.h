@@ -16,11 +16,12 @@
  */
 typedef struct {
     struct in_addr src;
-    int src_port;
+    u_int16_t sport;
     struct in_addr dst;
-    int dst_port;
+    u_int16_t dport;
     int bytes;
     int direction;
+    int protocol;
 } t_paquete;
 
 /**

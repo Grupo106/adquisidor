@@ -15,8 +15,8 @@ int main()
     /* Creo paquete mock, esto me lo deberia dar el libpcap */
     inet_aton("192.168.121.15", &paquete.src);
     inet_aton("192.168.121.177", &paquete.dst);
-    paquete.src_port = 80;
-    paquete.dst_port = 12345;
+    paquete.sport = 80;
+    paquete.dport = 12345;
     paquete.bytes = 50;
     /* Inserto el paquete en la base de datos */
     while(i--) insertar(&paquete);
