@@ -1,4 +1,5 @@
 /* vim: set ft=esqlc: */
+#include <assert.h>
 #include <string.h>
 #include "db.h"
 
@@ -28,6 +29,7 @@ void desconectar() {
 }
 
 void insertar(t_paquete *paquete) {
+    assert(paquete != NULL);
     /* Preparo sentencia insert */
     EXEC SQL PREPARE _insert FROM :_insert_stmt;
     /* Preparo parametros */
@@ -41,7 +43,7 @@ void insertar(t_paquete *paquete) {
          USING :_src, :_dst, :_src_port, :_dst_port, :_bytes;
     //EXEC SQL COMMIT;
     /* Libero recursos */
-    //EXEC SQL DEALLOCATE PREPARE _insert;
+    EXEC SQL DEALLOCATE PREPARE _insert;
 }
 
 void commit() {
