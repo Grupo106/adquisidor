@@ -7,11 +7,11 @@ Adquisidor de datos. Lee paquetes de red
 ### Fedora
   
 ```sh
-sudo dnf install -y libpcap libpcap-devel
+sudo dnf install libpcap-devel
 ```
 
-### FreeBSD
+### Debian
   
 ```sh
-pkg install libpcap
+apt-get install libpcap-dev
 ```
