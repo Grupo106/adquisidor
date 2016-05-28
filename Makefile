@@ -2,6 +2,7 @@ PROGRAM = adquisidor
 SRC_DIR = ./src
 BUILD_DIR = ./build
 BIN_DIR = ./bin
+INSTALL_DIR = /usr/local/sbin
 
 ECPG = ecpg
 CC = gcc
@@ -28,3 +29,6 @@ dirs:
 
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)
+
+install:
+	cp $(BIN_DIR)/$(PROGRAM) $(INSTALL_DIR)
