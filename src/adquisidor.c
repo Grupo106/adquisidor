@@ -115,6 +115,12 @@ void procesar_udp(const u_char *udp, t_paquete *paquete) {
     paquete->protocol = SOL_UDP;
 }
 
+/**
+* captura_inicio()
+* --------------------------------------------------------------------------
+* Captura, procesa y guarda información de los paquetes que atraviesan una
+* interfaz en la base de datos.
+*/
 void captura_inicio() {
     char *dev, errbuf[PCAP_ERRBUF_SIZE];
     char filter_exp[] = "udp or tcp";
@@ -157,6 +163,11 @@ void captura_inicio() {
     pcap_loop(__handle, 0, procesar_paquete, NULL);
 }
 
+/**
+* captura_fin()
+* --------------------------------------------------------------------------
+* Termina captura de paquetes y libera recursos
+*/
 void captura_fin() {
     pcap_freecode(&__fp);
     pcap_close(__handle);

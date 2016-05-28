@@ -25,6 +25,10 @@ int main() {
     /* conecto base de datos */
     int sqlret = bd_conectar();
     if(sqlret != 0) return(sqlret);
+    /*
+    * registro señales necesarias para cerrar correctamente el programa y
+    * para liberar recursos
+    */
     manejar_interrupciones();
     /* inicio captura de paquete de red */
     captura_inicio();
