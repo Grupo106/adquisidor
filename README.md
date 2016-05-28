@@ -1,8 +1,10 @@
-# adquisidor
+adquisidor
+======================================================
 Adquisidor de datos. Lee paquetes de red
 
 
-## Dependencias
+Dependencias
+-------------------------------------------------------
 
 ### Fedora
 
@@ -14,4 +16,11 @@ sudo dnf install libpcap-devel postgresql-devel
 
 ```sh
 apt-get install libpcap-dev posgresql-dev
+```
+
+Compilación e instalación
+-------------------------------------------------------
+```sh
+make
+make install
 ```
