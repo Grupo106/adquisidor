@@ -24,3 +24,5 @@ Compilación e instalación
 make
 make install
 ```
+
+**Atención**: Para la ejecución necesita privilegios de administrador (root)
