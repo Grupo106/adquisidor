@@ -2,18 +2,18 @@
 #define ADQUISIDOR_H
 
 /**
-* capturar()
+* captura_inicio()
 * --------------------------------------------------------------------------
 * Captura, procesa y guarda información de los paquetes que atraviesan una
 * interfaz en la base de datos.
 */
-void capturar();
+void captura_inicio();
 
 /**
-* terminar_captura()
+* captura_fin()
 * --------------------------------------------------------------------------
 * Termina captura de paquetes y libera recursos
 */
-void terminar_captura();
+void captura_fin();
 
 #endif /* ADQUISIDOR_H */

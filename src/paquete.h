@@ -1,8 +1,6 @@
 #ifndef PAQUETE_H
 #define PAQUETE_H
 
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
 
 #define INBOUND 0
@@ -15,13 +13,13 @@
  * datos
  */
 typedef struct {
-    struct in_addr src;
-    u_int16_t sport;
-    struct in_addr dst;
-    u_int16_t dport;
-    int bytes;
-    int direction;
-    int protocol;
+    struct in_addr src; /* direccion ip de origen */
+    u_int16_t sport; /* puerto de origen */
+    struct in_addr dst;  /* direccion ip de destino */
+    u_int16_t dport; /* puerto de destino */
+    int bytes; /* cantidad de bytes que contiene el paquete */
+    int direction; /* direccion del paquete (puede ser INBOUND o OUTBOUND) */
+    int protocol; /* protocolo (6 es TCP y 17 es UDP) */
 } t_paquete;
 
 #endif /* PAQUETE_H */

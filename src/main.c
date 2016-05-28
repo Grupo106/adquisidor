@@ -1,13 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+
 #include "adquisidor.h"
 #include "db.h"
 
 /**
 * terminar()
 * ---------------------------------------------------------------------------
-* Cierra conexion de base de datos y termina la captura de paquetes
+* Termina el programa de forma segura. Cierra conexion de base de datos y
+* termina la captura de paquetes
 */
 static void terminar(int);
 
@@ -25,7 +27,7 @@ int main() {
     if(sqlret != 0) return(sqlret);
     manejar_interrupciones();
     /* inicio captura de paquete de red */
-    capturar();
+    captura_inicio();
     return EXIT_SUCCESS;
 }
 
@@ -37,7 +39,7 @@ int main() {
 static void terminar(int signum) {
     fprintf(stderr, "Interrupción recibida %d\n", signum);
     bd_desconectar();
-    terminar_captura();
+    captura_fin();
 }
 
 /**
