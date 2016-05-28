@@ -19,6 +19,26 @@ EXEC SQL WHENEVER SQLERROR SQLPRINT;
 EXEC SQL WHENEVER SQLWARNING SQLPRINT;
 
 
+/**
+* imprimir()
+* ---------------------------------------------------------------------------
+* Imprime paquete en la salida estandar
+*/
+void imprimir(t_paquete *paquete) {
+    // imprimir paquete
+    char src[15], dst[15];
+    strcpy(src, inet_ntoa(paquete->src));
+    strcpy(dst, inet_ntoa(paquete->dst));
+    printf("paquete src:%s, dst:%s, sport:%d, dport:%d, bytes:%d, \
+protocol:%d\n",
+           src,
+           dst,
+           paquete->sport,
+           paquete->dport,
+           paquete->bytes,
+           paquete->protocol);
+}
+
 int bd_conectar() {
     //ECPGdebug(1, stderr);
     EXEC SQL CONNECT TO postgres@172.17.0.2 USER postgres/root;
@@ -45,6 +65,7 @@ void bd_insertar(t_paquete *paquete) {
          USING :_src, :_dst, :_sport, :_dport, :_bytes, :_protocol;
     /* Libero recursos */
     EXEC SQL DEALLOCATE PREPARE _insert;
+    imprimir(paquete);
 }
 
 void bd_commit() {

@@ -9,4 +9,11 @@
 */
 void capturar();
 
+/**
+* terminar_captura()
+* --------------------------------------------------------------------------
+* Termina captura de paquetes y libera recursos
+*/
+void terminar_captura();
+
 #endif /* ADQUISIDOR_H */
