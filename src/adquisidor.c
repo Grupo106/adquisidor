@@ -116,24 +116,24 @@ void procesar_udp(const u_char *udp, t_paquete *paquete) {
 }
 
 void captura_inicio() {
-	char *dev, errbuf[PCAP_ERRBUF_SIZE];
+    char *dev, errbuf[PCAP_ERRBUF_SIZE];
     char filter_exp[] = "udp or tcp";
     bpf_u_int32 mask;
     bpf_u_int32 net;
 
-	dev = pcap_lookupdev(errbuf);
-	if (dev == NULL) {
-		fprintf(stderr, "No se puede encontrar la interfaz: %s\n", errbuf);
-		exit(EXIT_FAILURE);
-	}
-	printf("Device: %s\n", dev);
+    dev = pcap_lookupdev(errbuf);
+    if (dev == NULL) {
+        fprintf(stderr, "No se puede encontrar la interfaz: %s\n", errbuf);
+        exit(EXIT_FAILURE);
+    }
+    printf("Device: %s\n", dev);
     if(pcap_lookupnet(dev, &net, &mask, errbuf) == -1) {
         fprintf(stderr, "No se puede obtener la máscara de subred de la\
         interfaz %s\n", dev);
     }
-	__handle = pcap_open_live(dev, BUFSIZ, 1, 100, errbuf);
+    __handle = pcap_open_live(dev, BUFSIZ, 1, 100, errbuf);
 
-	if (__handle == NULL) {
+    if (__handle == NULL) {
         fprintf(stderr, "No se puede abrir la interfaz %s: %s\n", dev,
                 errbuf);
         exit(EXIT_FAILURE);
