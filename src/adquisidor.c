@@ -5,13 +5,16 @@
 #include <netinet/ip.h>
 #include <netinet/udp.h>
 #include <netinet/tcp.h>
+
+#include "adquisidor.h"
 #include "db.h"
+#include "paquete.h"
 
-void callback(u_char*, const struct pcap_pkthdr*, const u_char*);
-
-void callback(u_char *args, const struct pcap_pkthdr *header, 
-              const u_char *packet) {
-    struct ip *ipc = NULL;
+void procesar_paquete(u_char *args,
+                      const struct pcap_pkthdr *header,
+                      const u_char *packet)
+{
+    struct ip *p_ip = NULL;
     struct udphdr *p_udp = NULL;
     struct tcphdr *p_tcp = NULL;
     int ip_size; /* Tamaño de la cabecera ip (es variable) */
@@ -20,21 +23,21 @@ void callback(u_char *args, const struct pcap_pkthdr *header,
     /* Obtengo la cabecera IP. Se le suma ETH_HLEN (14 bytes) que representan
      * la cabecera Ethernet, que en este caso la vamos a ignorar.
      */
-    ipc = (struct ip*) (packet + ETH_HLEN);
+    p_ip = (struct ip*) (packet + ETH_HLEN);
 
-    /* Calculo el tamaño en bytes de la cabecera IP. Dicho tamaño lo da la 
-     * cabecera IP en el campo Header Lenght como cantidad de palabras de 
+    /* Calculo el tamaño en bytes de la cabecera IP. Dicho tamaño lo da la
+     * cabecera IP en el campo Header Lenght como cantidad de palabras de
      * 4 bytes. Es por ello que se multiplica por 4 para obtener la cantidad
      * de bytes a desplazar
      */
-    ip_size = ipc->ip_hl * 4; 
+    ip_size = p_ip->ip_hl * 4;
 
-    paquete.src = ipc->ip_src;
-    paquete.dst = ipc->ip_dst;
-    paquete.bytes = ntohs(ipc->ip_len);
+    paquete.src = p_ip->ip_src;
+    paquete.dst = p_ip->ip_dst;
+    paquete.bytes = ntohs(p_ip->ip_len);
 
     /* Si el paquete es TCP */
-    if (ipc->ip_p == SOL_TCP) {
+    if (p_ip->ip_p == SOL_TCP) {
       /* Obtengo cabecera TCP */
       p_tcp = (struct tcphdr*) (packet + ETH_HLEN + ip_size);
       paquete.sport = ntohs(p_tcp->source);
@@ -43,16 +46,19 @@ void callback(u_char *args, const struct pcap_pkthdr *header,
     }
 
     /* Si el paquete es UDP */
-    else if (ipc->ip_p == SOL_UDP) {
+    else if (p_ip->ip_p == SOL_UDP) {
       /* Obtengo cabecera UDP */
       p_udp = (struct udphdr*) (packet + ETH_HLEN + ip_size);
       paquete.sport = ntohs(p_udp->source);
       paquete.dport = ntohs(p_udp->dest);
       paquete.protocol = SOL_UDP;
     }
-    else {
-        return;
-    }
+
+    bd_insertar(&paquete);
+    // XXX: Por ahora lo pongo aca
+    bd_commit();
+    
+    // imprimir paquete
     char src[15], dst[15];
     strcpy(src, inet_ntoa(paquete.src));
     strcpy(dst, inet_ntoa(paquete.dst));
@@ -65,8 +71,7 @@ void callback(u_char *args, const struct pcap_pkthdr *header,
            paquete.protocol);
 }
 
-int main()
-{
+void capturar() {
 	char *dev, errbuf[PCAP_ERRBUF_SIZE];
 	pcap_t *handle;
     struct bpf_program fp;
@@ -107,13 +112,11 @@ int main()
     }
     /* Capturando paquetes */
     printf("Esperando paquetes con filtro: %s\n", filter_exp);
-    pcap_loop(handle, 0, callback, NULL);
+    pcap_loop(handle, 0, procesar_paquete, NULL);
 
     /* Limpiando */
     pcap_freecode(&fp);
     pcap_close(handle);
 
     printf("\nCaptura completa\n");
-
-	return(0);
 }

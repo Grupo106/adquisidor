@@ -1,63 +1,35 @@
 #ifndef DB_H
 #define DB_H
 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
-#define INBOUND 0
-#define OUTBOUND 1
+#include "paquete.h"
 
 /**
- * t_paquete
- * _________________________________________________________________________
- * Estructura del paquete de red. Esto es lo que se guardará en la base de
- * datos
- */
-typedef struct {
-    struct in_addr src;
-    u_int16_t sport;
-    struct in_addr dst;
-    u_int16_t dport;
-    int bytes;
-    int direction;
-    int protocol;
-} t_paquete;
-
-/**
- * conectar()
+ * bd_conectar()
  * -------------------------------------------------------------------------
  * Conecta con la base de datos
  */
-int conectar();
+int bd_conectar();
 
 /**
- * desconectar()
+ * bd_desconectar()
  * -------------------------------------------------------------------------
  * Desconecta con la base de datos
  */
-void desconectar();
+void bd_desconectar();
 
 /**
- * insertar(t_paquete*)
+ * bd_insertar(t_paquete*)
  * -------------------------------------------------------------------------
  * Inserta un paquete en el almacen de datos.
  * Luego de insertar los paquetes es necesario hacer un commit()
  */
-void insertar(t_paquete *paquete);
+void bd_insertar(t_paquete *paquete);
 
 /**
- * commit()
+ * bd_commit()
  * -------------------------------------------------------------------------
  * Hace un commit de la transaccion en la base de datos
  */
-void commit();
-
-/**
- * listar()
- * -------------------------------------------------------------------------
- * Lista los ultimos 10 registros en el almacen de datos
- */
-void listar();
+void bd_commit();
 
 #endif /* DB_H */

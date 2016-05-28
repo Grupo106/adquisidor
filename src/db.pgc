@@ -8,27 +8,28 @@ EXEC SQL BEGIN DECLARE SECTION;
          _dst[15];
     int _sport,
         _dport,
-        _bytes;
-    const char *_insert_stmt = 
-    "INSERT INTO traffic (src, dst, sport, dport, bytes) \
-     VALUES(?, ?, ?, ?, ?);";
+        _bytes,
+        _protocol;
+    const char *_insert_stmt =
+    "INSERT INTO traffic (src, dst, sport, dport, bytes, protocol) \
+     VALUES(?, ?, ?, ?, ?, ?);";
 EXEC SQL END DECLARE SECTION;
 
 EXEC SQL WHENEVER SQLERROR SQLPRINT;
 EXEC SQL WHENEVER SQLWARNING SQLPRINT;
 
 
-int conectar() {
+int bd_conectar() {
     //ECPGdebug(1, stderr);
     EXEC SQL CONNECT TO postgres@172.17.0.2 USER postgres/root;
     return sqlca.sqlcode;
 }
 
-void desconectar() {
+void bd_desconectar() {
     EXEC SQL DISCONNECT ALL;
 }
 
-void insertar(t_paquete *paquete) {
+void bd_insertar(t_paquete *paquete) {
     assert(paquete != NULL);
     /* Preparo sentencia insert */
     EXEC SQL PREPARE _insert FROM :_insert_stmt;
@@ -38,37 +39,14 @@ void insertar(t_paquete *paquete) {
     _sport = paquete->sport;
     _dport = paquete->dport;
     _bytes = paquete->bytes;
+    _protocol = paquete->protocol;
     /* Ejecuto sentencia */
-    EXEC SQL EXECUTE _insert 
-         USING :_src, :_dst, :_sport, :_dport, :_bytes;
-    //EXEC SQL COMMIT;
+    EXEC SQL EXECUTE _insert
+         USING :_src, :_dst, :_sport, :_dport, :_bytes, :_protocol;
     /* Libero recursos */
     EXEC SQL DEALLOCATE PREPARE _insert;
 }
 
-void commit() {
-    EXEC SQL COMMIT;
-}
-
-void listar() {
-    /* Preparo select */
-    EXEC SQL DECLARE _lista CURSOR FOR
-         SELECT src, dst, sport, dport, bytes 
-         FROM traffic
-         ORDER BY id DESC
-         LIMIT 10;
-    /* Cuando no encuentra datos en el cursor, sale del ciclo */
-    EXEC SQL WHENEVER NOT FOUND DO BREAK;
-    /* Abro cursor */
-    EXEC SQL OPEN _lista;
-    /* Recorro resultados */
-    while(1) {
-        EXEC SQL FETCH FROM _lista 
-             INTO :_src, :_dst, :_sport, :_dport, :_bytes;
-        printf("%s:%d -> %s:%d\t%d bytes\n", 
-                _src, _sport, _dst, _dport, _bytes);
-    }
-    /* Cierro cursor */
-    EXEC SQL CLOSE _lista;
+void bd_commit() {
     EXEC SQL COMMIT;
 }
