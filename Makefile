@@ -1,6 +1,7 @@
 BANNER = "$(PROGRAM) - Grupo 106 - Universidad Nacional de La Matanza. 2016"
 
-PROGRAM := adquisidor# nombre del programa
+# Nombre del programa
+PROGRAM := adquisidor
 
 # Directorios
 # ---------------------------------------------------------------------------
@@ -16,8 +17,9 @@ CC := $(shell which gcc)
 
 # Versiones
 # ---------------------------------------------------------------------------
-REVISION := $(shell git rev-parse HEAD) # obtiene la revision desde el ultimo
-			   						    # commit
+
+# obtiene la revision desde el ultimo commit
+REVISION := $(shell git rev-parse HEAD) 
 
 # FLAGS
 # ---------------------------------------------------------------------------

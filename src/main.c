@@ -5,6 +5,10 @@
 #include "adquisidor.h"
 #include "db.h"
 
+#ifndef REVISION
+#define REVISION "DESCONOCIDA"
+#endif /* REVISION */
+
 /**
 * terminar()
 * ---------------------------------------------------------------------------
