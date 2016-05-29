@@ -1,4 +1,4 @@
-BANNER = "Universidad Nacional de La Matanza. 2016 - $(PROGRAM)"
+BANNER = "$(PROGRAM) - Grupo 106 - Universidad Nacional de La Matanza. 2016"
 
 PROGRAM := adquisidor# nombre del programa
 
@@ -26,12 +26,12 @@ LINK_FLAGS := -lecpg -lpcap
 
 # Archivos de codigo fuente
 # ---------------------------------------------------------------------------
-C_SOURCES := $(shell find $(SRC_PATH) -name '*.c' -printf '%T@\t%p\n' \
+C_SOURCES := $(shell find $(SRC_DIR) -name '*.c' -printf '%T@\t%p\n' \
 			   | sort -k 1nr | cut -f2-)
-PGC_SOURCES := $(shell find $(SRC_PATH) -name '*.pgc' -printf '%T@\t%p\n' \
+PGC_SOURCES := $(shell find $(SRC_DIR) -name '*.pgc' -printf '%T@\t%p\n' \
 				 | sort -k 1nr | cut -f2-)
 
-# Archivos de objeto
+# Archivos objeto
 # ---------------------------------------------------------------------------
 OBJECTS := $(C_SOURCES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 OBJECTS += $(PGC_SOURCES:$(SRC_DIR)/%.pgc=$(BUILD_DIR)/%.o)
@@ -57,13 +57,14 @@ install: banner
 
 banner:
 	@echo $(BANNER)
+	@echo ----------------------------------------------------------------
 
 .PHONY: all dirs clean install banner
 
 # Compilacion final
 # ---------------------------------------------------------------------------
 $(BIN_DIR)/$(PROGRAM): $(OBJECTS)
-	@echo "Compilando $<"
+	@echo "Compilando $@"
 	@$(CC) $(LINK_FLAGS) -o $@ $(OBJECTS)
 
 # Compilacion de archivos .c

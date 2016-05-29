@@ -21,11 +21,16 @@ static void terminar(int);
 */
 void manejar_interrupciones();
 
+/**
+* banner()
+* ---------------------------------------------------------------------------
+* Imprime banner con version del programa
+*/
+void banner();
+
 int main() {
-    printf("--------------------------------------------------------------\n");
-    printf("Universidad Nacional de La Matanza. 2016\n");
-    printf("Adquisidor - Revision: %s\n", REVISION);
-    printf("--------------------------------------------------------------\n");
+    /* Imprimo banner con version */
+    banner();
     /* conecto base de datos */
     int sqlret = bd_conectar();
     if(sqlret != 0) return(sqlret);
@@ -60,4 +65,18 @@ void manejar_interrupciones() {
     signal(SIGINT, terminar);
     signal(SIGTERM, terminar);
     signal(SIGQUIT, terminar);
+}
+
+/**
+* banner()
+* ---------------------------------------------------------------------------
+* Imprime banner con version del programa
+*/
+void banner() {
+    printf("\
+---------------------------------------------------------------------------\n\
+Universidad Nacional de La Matanza. 2016                                   \n\
+Adquisidor - Revision: %s                                                  \n\
+---------------------------------------------------------------------------\n",
+      REVISION);
 }

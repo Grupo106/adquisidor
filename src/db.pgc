@@ -1,7 +1,9 @@
 /* vim: set ft=c: */
 #include <assert.h>
 #include <string.h>
+
 #include "db.h"
+#include "paquete.h"
 
 EXEC SQL BEGIN DECLARE SECTION;
     char _src[15],
