@@ -48,7 +48,7 @@ protocol:%d\n",
  */
 int bd_conectar() {
     //ECPGdebug(1, stderr);
-    EXEC SQL CONNECT TO postgres@172.17.0.2 USER postgres/root;
+    EXEC SQL CONNECT TO postgres USER postgres/root;
     return sqlca.sqlcode;
 }
 
