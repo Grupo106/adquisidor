@@ -1,12 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <syslog.h>
 
 #include "adquisidor.h"
 #include "db.h"
 
 #ifndef REVISION
 #define REVISION "DESCONOCIDA"
+#endif /* REVISION */
+
+#ifndef PROGRAM
+#define PROGRAM "adquisidor"
 #endif /* REVISION */
 
 /**
@@ -35,6 +40,8 @@ void banner();
 int main() {
     /* Imprimo banner con version */
     banner();
+    /* Inicializo logs */
+    openlog(PROGRAM, LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);
     /* conecto base de datos */
     int sqlret = bd_conectar();
     if(sqlret != 0) return(sqlret);
@@ -44,6 +51,7 @@ int main() {
     */
     manejar_interrupciones();
     /* inicio captura de paquete de red */
+    syslog(LOG_INFO, "Iniciando captura");
     captura_inicio();
     return EXIT_SUCCESS;
 }
@@ -57,6 +65,7 @@ static void terminar(int signum) {
     fprintf(stderr, "Interrupción recibida %d\n", signum);
     bd_desconectar();
     captura_fin();
+    closelog();
 }
 
 /**
@@ -79,8 +88,8 @@ void manejar_interrupciones() {
 void banner() {
     printf("\
 ---------------------------------------------------------------------------\n\
-Universidad Nacional de La Matanza. 2016                                   \n\
-Adquisidor - Revision: %s                                                  \n\
+Grupo 106 - Universidad Nacional de La Matanza. 2016                       \n\
+%s - Revision: %s                                                          \n\
 ---------------------------------------------------------------------------\n",
-      REVISION);
+     PROGRAM, REVISION);
 }

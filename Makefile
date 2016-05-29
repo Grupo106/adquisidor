@@ -20,11 +20,14 @@ CC := $(shell which gcc)
 # ---------------------------------------------------------------------------
 
 # obtiene la revision desde el ultimo commit
-REVISION := $(shell git describe --tags) 
+REVISION := $(shell git describe --tags)
 
 # FLAGS
 # ---------------------------------------------------------------------------
-COMPILE_FLAGS := -Wall -Wextra -g -O2 -D"REVISION=\"$(REVISION)\""
+COMPILE_FLAGS := -Wall -Wextra -g -O2 \
+                 -D"REVISION=\"$(REVISION)\"" \
+						     -D"PROGRAM=\"$(PROGRAM)\"" \
+								 -I/usr/include/postgresql
 LINK_FLAGS := -lecpg -lpcap
 
 # Archivos de codigo fuente
