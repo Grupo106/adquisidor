@@ -1,6 +1,6 @@
 adquisidor
 ======================================================
-Adquisidor de datos. Lee paquetes de red
+Adquisidor de datos. Captura, procesa y guarda datos de paquetes de red en la base de datos
 
 
 Dependencias
