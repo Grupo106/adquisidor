@@ -41,7 +41,7 @@ int main() {
     /* Imprimo banner con version */
     banner();
     /* Inicializo logs */
-    //openlog(PROGRAM, LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);
+    openlog(PROGRAM, LOG_CONS | LOG_PID, LOG_LOCAL0);
     /* conecto base de datos */
     int sqlret = bd_conectar();
     if(sqlret != 0) return(sqlret);
@@ -51,7 +51,7 @@ int main() {
     */
     manejar_interrupciones();
     /* inicio captura de paquete de red */
-    //syslog(LOG_INFO, "Iniciando captura");
+    syslog(LOG_INFO, "Iniciando captura");
     captura_inicio();
     return EXIT_SUCCESS;
 }
