@@ -63,18 +63,18 @@ banner:
 # Compilacion final
 # ---------------------------------------------------------------------------
 $(BIN_DIR)/$(PROGRAM): $(OBJECTS)
-	@echo "Compilando $@"
+	@echo "Compilando $<"
 	@$(CC) $(LINK_FLAGS) -o $@ $(OBJECTS)
 
 # Compilacion de archivos .c
 # ---------------------------------------------------------------------------
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
-	@echo "Compilando $@"
+	@echo "Compilando $<"
 	@$(CC) $(COMPILE_FLAGS) -o $@ -c $<
 
 # Compilacion de archivos .pgc (postgresql embebido en C)
 # ---------------------------------------------------------------------------
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.pgc
-	@echo "Compilando $@"
+	@echo "Compilando $<"
 	@$(ECPG) -o $(BUILD_DIR)/$*.c $<
 	@$(CC) $(COMPILE_FLAGS) -I$(SRC_DIR) -o $@ -c $(BUILD_DIR)/$*.c
