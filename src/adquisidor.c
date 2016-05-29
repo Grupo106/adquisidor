@@ -9,6 +9,8 @@
 #include "db.h"
 #include "paquete.h"
 
+#define FILTER "tcp or udp"
+
 /**
 * UNUSED(x)
 * --------------------------------------------------------------------------
@@ -122,10 +124,8 @@ void procesar_udp(const u_char *udp, t_paquete *paquete) {
 * interfaz en la base de datos.
 */
 void captura_inicio() {
-    char *dev, errbuf[PCAP_ERRBUF_SIZE];
-    char filter_exp[] = "udp or tcp";
-    bpf_u_int32 mask;
-    bpf_u_int32 net;
+    char *dev;
+    char errbuf[PCAP_ERRBUF_SIZE];
 
     dev = pcap_lookupdev(errbuf);
     if (dev == NULL) {
@@ -133,10 +133,6 @@ void captura_inicio() {
         exit(EXIT_FAILURE);
     }
     printf("Device: %s\n", dev);
-    if(pcap_lookupnet(dev, &net, &mask, errbuf) == -1) {
-        fprintf(stderr, "No se puede obtener la máscara de subred de la\
-        interfaz %s\n", dev);
-    }
     __handle = pcap_open_live(dev, BUFSIZ, 1, 100, errbuf);
 
     if (__handle == NULL) {
@@ -148,18 +144,18 @@ void captura_inicio() {
         fprintf(stderr, "La interfaz %s no provee cabeceras Ethernet", dev);
         exit(EXIT_FAILURE);
     }
-    if (pcap_compile(__handle, &__fp, filter_exp, 0, net) == -1) {
+    if (pcap_compile(__handle, &__fp, FILTER, 0, PCAP_NETMASK_UNKNOWN) == -1) {
         fprintf(stderr, "No se puede parsear el filtro '%s': %s\n",
-                filter_exp, pcap_geterr(__handle));
+                FILTER, pcap_geterr(__handle));
         exit(EXIT_FAILURE);
     }
     if (pcap_setfilter(__handle, &__fp) == -1) {
         fprintf(stderr, "No se puede instalar el filtro '%s': %s\n",
-                filter_exp, pcap_geterr(__handle));
+                FILTER, pcap_geterr(__handle));
         exit(EXIT_FAILURE);
     }
     /* Capturando paquetes */
-    printf("Esperando paquetes con filtro: %s\n", filter_exp);
+    printf("Esperando paquetes con filtro: %s\n", FILTER);
     pcap_loop(__handle, 0, procesar_paquete, NULL);
 }
 
