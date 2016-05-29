@@ -26,9 +26,12 @@ REVISION := $(shell git describe --tags)
 # ---------------------------------------------------------------------------
 COMPILE_FLAGS := -Wall -Wextra -g -O2 \
                  -D"REVISION=\"$(REVISION)\"" \
-						     -D"PROGRAM=\"$(PROGRAM)\"" \
+	  						 -D"PROGRAM=\"$(PROGRAM)\"" \
 								 -I/usr/include/postgresql
 LINK_FLAGS := -lecpg -lpcap
+EPCG_FLAGS := -D"POSTGRES_CONNECTION_STRING=\"postgres@172.17.0.2\"" \
+              -D"POSTGRES_USER=\"postgres\"" \
+              -D"POSTGRES_PASSWD=\"root\""
 
 # Archivos de codigo fuente
 # ---------------------------------------------------------------------------
@@ -82,5 +85,5 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 # ---------------------------------------------------------------------------
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.pgc
 	@echo "Compilando $<"
-	@$(ECPG) -o $(BUILD_DIR)/$*.c $<
+	@$(ECPG) $(EPCG_FLAGS) -o $(BUILD_DIR)/$*.c $<
 	@$(CC) $(COMPILE_FLAGS) -I$(SRC_DIR) -o $@ -c $(BUILD_DIR)/$*.c

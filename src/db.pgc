@@ -48,7 +48,8 @@ protocol:%d\n",
  */
 int bd_conectar() {
     //ECPGdebug(1, stderr);
-    EXEC SQL CONNECT TO postgres USER postgres/root;
+    EXEC SQL CONNECT TO POSTGRES_CONNECTION_STRING USER POSTGRES_USER/
+                                                        POSTGRES_PASSWD;
     return sqlca.sqlcode;
 }
 
