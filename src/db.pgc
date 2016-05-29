@@ -79,6 +79,8 @@ void bd_insertar(t_paquete *paquete) {
     _dport = paquete->dport;
     _bytes = paquete->bytes;
     _protocol = paquete->protocol;
+    assert(strlen(_src) > 0);
+    assert(strlen(_dst) > 0);
     /* Ejecuto sentencia */
     EXEC SQL EXECUTE _insert
          USING :_src, :_dst, :_sport, :_dport, :_bytes, :_protocol;
