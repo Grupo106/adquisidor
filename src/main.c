@@ -22,6 +22,10 @@ static void terminar(int);
 void manejar_interrupciones();
 
 int main() {
+    printf("--------------------------------------------------------------\n");
+    printf("Universidad Nacional de La Matanza. 2016\n");
+    printf("Adquisidor - Revision: %s\n", REVISION);
+    printf("--------------------------------------------------------------\n");
     /* conecto base de datos */
     int sqlret = bd_conectar();
     if(sqlret != 0) return(sqlret);

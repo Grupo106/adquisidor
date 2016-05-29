@@ -1,34 +1,80 @@
-PROGRAM = adquisidor
-SRC_DIR = ./src
-BUILD_DIR = ./build
-BIN_DIR = ./bin
-INSTALL_DIR = /usr/local/sbin
+BANNER = "Universidad Nacional de La Matanza. 2016 - $(PROGRAM)"
 
-ECPG = ecpg
-CC = gcc
-COMPILE_FLAGS = -Wall -Wextra -g -O2
-LINK_FLAGS = -lecpg -lpcap
+PROGRAM := adquisidor# nombre del programa
 
-all: dirs $(BIN_DIR)/$(PROGRAM)
+# Directorios
+# ---------------------------------------------------------------------------
+SRC_DIR := ./src
+BUILD_DIR := ./build
+BIN_DIR := ./bin
+INSTALL_DIR := /usr/local/sbin
 
-$(BIN_DIR)/$(PROGRAM): $(BUILD_DIR)/main.o $(BUILD_DIR)/db.o $(BUILD_DIR)/adquisidor.o
-	$(CC) $(LINK_FLAGS) -o $(BIN_DIR)/$(PROGRAM) $(BUILD_DIR)/db.o $(BUILD_DIR)/main.o $(BUILD_DIR)/adquisidor.o
+# Binarios
+# ---------------------------------------------------------------------------
+ECPG := $(shell which ecpg)
+CC := $(shell which gcc)
 
-$(BUILD_DIR)/main.o: $(SRC_DIR)/main.c
-	$(CC) $(COMPILE_FLAGS) $(INCLUDES_FLAGS) -o $(BUILD_DIR)/main.o -c $(SRC_DIR)/main.c
+# Versiones
+# ---------------------------------------------------------------------------
+REVISION := $(shell git rev-parse HEAD) # obtiene la revision desde el ultimo
+			   						    # commit
 
-$(BUILD_DIR)/adquisidor.o: $(SRC_DIR)/adquisidor.c
-	$(CC) $(COMPILE_FLAGS) $(INCLUDES_FLAGS) -o $(BUILD_DIR)/adquisidor.o -c $(SRC_DIR)/adquisidor.c
+# FLAGS
+# ---------------------------------------------------------------------------
+COMPILE_FLAGS := -Wall -Wextra -g -O2 -D"REVISION=\"$(REVISION)\""
+LINK_FLAGS := -lecpg -lpcap
 
-$(BUILD_DIR)/db.o: $(SRC_DIR)/db.pgc
-	$(ECPG) -o $(BUILD_DIR)/db.c $(SRC_DIR)/db.pgc
-	$(CC) $(COMPILE_FLAGS) -I$(SRC_DIR) -o $(BUILD_DIR)/db.o -c $(BUILD_DIR)/db.c
+# Archivos de codigo fuente
+# ---------------------------------------------------------------------------
+C_SOURCES := $(shell find $(SRC_PATH) -name '*.c' -printf '%T@\t%p\n' \
+			   | sort -k 1nr | cut -f2-)
+PGC_SOURCES := $(shell find $(SRC_PATH) -name '*.pgc' -printf '%T@\t%p\n' \
+				 | sort -k 1nr | cut -f2-)
 
+# Archivos de objeto
+# ---------------------------------------------------------------------------
+OBJECTS := $(C_SOURCES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
+OBJECTS += $(PGC_SOURCES:$(SRC_DIR)/%.pgc=$(BUILD_DIR)/%.o)
+
+
+# Compila todos los binarios
+all: banner dirs $(BIN_DIR)/$(PROGRAM)
+	@echo "$(PROGRAM) se ha compilado correctamente"
+
+# Crea los directorios necesarios
 dirs:
 	@mkdir -p $(BUILD_DIR) $(BIN_DIR)
 
-clean:
-	rm -rf $(BUILD_DIR) $(BIN_DIR)
+# Limpia archivos generados por el make
+clean: banner
+	@rm -rf $(BUILD_DIR) $(BIN_DIR)
+	@echo "$@: Se limpiaron los archivos generados"
 
-install:
+# Instala binarios en el host (requiere privilegios de root)
+install: banner
 	cp $(BIN_DIR)/$(PROGRAM) $(INSTALL_DIR)
+	@echo "$(PROGRAM) instalado correctamente"
+
+banner:
+	@echo $(BANNER)
+
+.PHONY: all dirs clean install banner
+
+# Compilacion final
+# ---------------------------------------------------------------------------
+$(BIN_DIR)/$(PROGRAM): $(OBJECTS)
+	@echo "Compilando $@"
+	@$(CC) $(LINK_FLAGS) -o $@ $(OBJECTS)
+
+# Compilacion de archivos .c
+# ---------------------------------------------------------------------------
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	@echo "Compilando $@"
+	@$(CC) $(COMPILE_FLAGS) -o $@ -c $<
+
+# Compilacion de archivos .pgc (postgresql embebido en C)
+# ---------------------------------------------------------------------------
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.pgc
+	@echo "Compilando $@"
+	@$(ECPG) -o $(BUILD_DIR)/$*.c $<
+	@$(CC) $(COMPILE_FLAGS) -I$(SRC_DIR) -o $@ -c $(BUILD_DIR)/$*.c
