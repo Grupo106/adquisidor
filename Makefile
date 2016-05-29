@@ -1,3 +1,4 @@
+# Banner que muestra al inicio
 BANNER = "$(PROGRAM) - Grupo 106 - Universidad Nacional de La Matanza. 2016"
 
 # Nombre del programa
@@ -19,7 +20,7 @@ CC := $(shell which gcc)
 # ---------------------------------------------------------------------------
 
 # obtiene la revision desde el ultimo commit
-REVISION := $(shell git rev-parse HEAD) 
+REVISION := $(shell git describe --tags) 
 
 # FLAGS
 # ---------------------------------------------------------------------------
@@ -38,10 +39,9 @@ PGC_SOURCES := $(shell find $(SRC_DIR) -name '*.pgc' -printf '%T@\t%p\n' \
 OBJECTS := $(C_SOURCES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 OBJECTS += $(PGC_SOURCES:$(SRC_DIR)/%.pgc=$(BUILD_DIR)/%.o)
 
-
 # Compila todos los binarios
 all: banner dirs $(BIN_DIR)/$(PROGRAM)
-	@echo "$(PROGRAM) se ha compilado correctamente"
+	@echo "$(PROGRAM) se ha compilado correctamente - Revision $(REVISION)"
 
 # Crea los directorios necesarios
 dirs:
