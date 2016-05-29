@@ -41,7 +41,7 @@ OBJECTS += $(PGC_SOURCES:$(SRC_DIR)/%.pgc=$(BUILD_DIR)/%.o)
 
 # Compila todos los binarios
 all: banner dirs $(BIN_DIR)/$(PROGRAM)
-	@echo "$(PROGRAM) se ha compilado correctamente - Revision $(REVISION)"
+	@echo "$(PROGRAM) está en la última versión"
 
 # Crea los directorios necesarios
 dirs:
@@ -66,7 +66,7 @@ banner:
 # Compilacion final
 # ---------------------------------------------------------------------------
 $(BIN_DIR)/$(PROGRAM): $(OBJECTS)
-	@echo "Compilando $@"
+	@echo "Compilando $@ - Revision $(REVISION)"
 	@$(CC) $(LINK_FLAGS) -o $@ $(OBJECTS)
 
 # Compilacion de archivos .c
