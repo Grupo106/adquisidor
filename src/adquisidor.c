@@ -1,5 +1,6 @@
 #include <pcap.h>
 #include <stdlib.h>
+#include <syslog.h>
 #include <net/ethernet.h>
 #include <netinet/ip.h>
 #include <netinet/udp.h>
@@ -132,30 +133,29 @@ void captura_inicio() {
         fprintf(stderr, "No se puede encontrar la interfaz: %s\n", errbuf);
         exit(EXIT_FAILURE);
     }
-    printf("Device: %s\n", dev);
-    __handle = pcap_open_live(dev, BUFSIZ, 1, 100, errbuf);
+    syslog(LOG_INFO, "Device: %s\n", dev);
 
+    __handle = pcap_open_live(dev, BUFSIZ, 1, 100, errbuf);
     if (__handle == NULL) {
-        fprintf(stderr, "No se puede abrir la interfaz %s: %s\n", dev,
-                errbuf);
+        syslog(LOG_CRIT, "No se puede abrir la interfaz: %s\n", errbuf);
         exit(EXIT_FAILURE);
     }
     if (pcap_datalink(__handle) != DLT_EN10MB) {
-        fprintf(stderr, "La interfaz %s no provee cabeceras Ethernet", dev);
+        syslog(LOG_CRIT, "La interfaz %s no provee cabeceras Ethernet", dev);
         exit(EXIT_FAILURE);
     }
     if (pcap_compile(__handle, &__fp, FILTER, 0, PCAP_NETMASK_UNKNOWN) == -1) {
-        fprintf(stderr, "No se puede parsear el filtro '%s': %s\n",
+        syslog(LOG_CRIT, "No se puede parsear el filtro '%s': %s\n",
                 FILTER, pcap_geterr(__handle));
         exit(EXIT_FAILURE);
     }
     if (pcap_setfilter(__handle, &__fp) == -1) {
-        fprintf(stderr, "No se puede instalar el filtro '%s': %s\n",
+        syslog(LOG_CRIT, "No se puede instalar el filtro '%s': %s\n",
                 FILTER, pcap_geterr(__handle));
         exit(EXIT_FAILURE);
     }
     /* Capturando paquetes */
-    printf("Esperando paquetes con filtro: %s\n", FILTER);
+    syslog(LOG_INFO, "Esperando paquetes con filtro: %s\n", FILTER);
     pcap_loop(__handle, 0, procesar_paquete, NULL);
 }
 
@@ -167,5 +167,4 @@ void captura_inicio() {
 void captura_fin() {
     pcap_freecode(&__fp);
     pcap_close(__handle);
-    printf("\nCaptura completa\n");
 }

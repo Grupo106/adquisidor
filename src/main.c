@@ -7,11 +7,17 @@
 #include "db.h"
 
 #ifndef REVISION
-#define REVISION "DESCONOCIDA"
+    #define REVISION "DESCONOCIDA"
 #endif /* REVISION */
 
 #ifndef PROGRAM
-#define PROGRAM "adquisidor"
+    #define PROGRAM "adquisidor"
+#endif /* REVISION */
+
+#ifdef DEBUG
+    #define BUILD_MODE "desarrollo"
+#else
+    #define BUILD_MODE "produccion"
 #endif /* REVISION */
 
 /**
@@ -50,8 +56,10 @@ int main() {
     * para liberar recursos
     */
     manejar_interrupciones();
+    /* muestro informacion del build */
+    syslog(LOG_INFO, "Revision: %s (%s)", REVISION, BUILD_MODE);
+    syslog(LOG_INFO, "Iniciando captura.");
     /* inicio captura de paquete de red */
-    syslog(LOG_INFO, "Iniciando captura");
     captura_inicio();
     return EXIT_SUCCESS;
 }
@@ -62,9 +70,11 @@ int main() {
 * Cierra conexion de base de datos y termina la captura de paquetes
 */
 static void terminar(int signum) {
-    fprintf(stderr, "Interrupción recibida %d\n", signum);
+    syslog(LOG_WARNING, "Interrupción recibida %d\n", signum);
     bd_desconectar();
     captura_fin();
+    syslog(LOG_INFO, "Captura terminada");
+    closelog();
     exit(EXIT_SUCCESS);
 }
 
@@ -89,7 +99,7 @@ void banner() {
     printf("\
 ---------------------------------------------------------------------------\n\
 Grupo 106 - Universidad Nacional de La Matanza. 2016                       \n\
-%s - Revision: %s                                                          \n\
+%s - Revision: %s (%s)                                                     \n\
 ---------------------------------------------------------------------------\n",
-     PROGRAM, REVISION);
+     PROGRAM, REVISION, BUILD_MODE);
 }

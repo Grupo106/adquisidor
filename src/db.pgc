@@ -87,7 +87,9 @@ void bd_insertar(t_paquete *paquete) {
          USING :_src, :_dst, :_sport, :_dport, :_bytes, :_protocol;
     /* Libero recursos */
     EXEC SQL DEALLOCATE PREPARE _insert;
-    imprimir(paquete);
+    #ifdef DEBUG
+        imprimir(paquete);
+    #endif
 }
 
 /**
