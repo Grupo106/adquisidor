@@ -1,3 +1,5 @@
+[![GitHub tag](https://img.shields.io/github/tag/Grupo106/adquisidor.svg?maxAge=2592000?style=plastic)](https://github.com/Grupo106/adquisidor/releases)
+
 adquisidor
 ======================================================
 Adquisidor de datos. Captura, procesa y guarda datos de paquetes de red en la base de datos
