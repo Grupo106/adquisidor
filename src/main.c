@@ -44,10 +44,12 @@ void manejar_interrupciones();
 void banner();
 
 int main() {
-    /* Imprimo banner con version */
-    banner();
     /* Inicializo logs */
     openlog(PROGRAM, LOG_CONS | LOG_PID, LOG_LOCAL0);
+    /* muestro informacion del build */
+    syslog(LOG_INFO, "Revision: %s (%s)", REVISION, BUILD_MODE);
+    /* Imprimo banner con version */
+    banner();
     /* conecto base de datos */
     int sqlret = bd_conectar();
     if(sqlret != 0) return(sqlret);
@@ -56,8 +58,6 @@ int main() {
     * para liberar recursos
     */
     manejar_interrupciones();
-    /* muestro informacion del build */
-    syslog(LOG_INFO, "Revision: %s (%s)", REVISION, BUILD_MODE);
     /* inicio captura de paquete de red */
     captura_inicio();
     return EXIT_SUCCESS;
