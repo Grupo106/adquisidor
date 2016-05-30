@@ -75,12 +75,12 @@ debug: export EPGCFLAGS := $(EPCGFLAGS) $(EPCG_FLAGS) $(D_EPCG_FLAGS)
 release: export BIN_PATH := $(BIN_DIR)/$(RELEASE_DIR)
 debug: export BIN_PATH := $(BIN_DIR)/$(DEBUG_DIR)
 
-debug: banner
-	@echo "Empezando construccion en modo desarrollo"
-	@$(MAKE) all --no-print-directory
-
 release: banner
 	@echo "Empezando construccion en modo produccion"
+	@$(MAKE) all --no-print-directory
+
+debug: banner
+	@echo "Empezando construccion en modo desarrollo"
 	@$(MAKE) all --no-print-directory
 
 # Compila todos los binarios
@@ -128,5 +128,5 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 # ---------------------------------------------------------------------------
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.pgc
 	@echo "Compilando $<"
-	$(ECPG) $(EPGCFLAGS) -o $(BUILD_DIR)/$*.c $<
+	@$(ECPG) $(EPGCFLAGS) -o $(BUILD_DIR)/$*.c $<
 	@$(CC) $(CFLAGS) -I$(SRC_DIR) -o $@ -c $(BUILD_DIR)/$*.c

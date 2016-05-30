@@ -20,9 +20,23 @@ apt-get install libpcap-dev posgresql-dev
 
 Compilación e instalación
 -------------------------------------------------------
+### Desarrollo
 ```sh
-make release
-make install
+make debug
+```
+
+### Produccion
+```sh
+make
+sudo make install
 ```
 
 **Atención**: Para la ejecución necesita privilegios de administrador (root)
+
+Ver logs
+-------------------------------------------------------
+Para ver logs generados por la aplicación se puede utilizar el journalctl
+provisto por systemd
+```
+journalctl -t adquisidor -f
+```
