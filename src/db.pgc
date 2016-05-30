@@ -1,13 +1,14 @@
 /* vim: set ft=c: */
 #include <assert.h>
 #include <string.h>
+#include <arpa/inet.h>
 
 #include "db.h"
 #include "paquete.h"
 
 EXEC SQL BEGIN DECLARE SECTION;
-    char _src[15],
-         _dst[15];
+    char _src[INET_ADDRSTRLEN],
+         _dst[INET_ADDRSTRLEN];
     int _sport,
         _dport,
         _bytes,
@@ -28,9 +29,9 @@ EXEC SQL WHENEVER SQLWARNING SQLPRINT;
 */
 void imprimir(t_paquete *paquete) {
     // imprimir paquete
-    char src[15], dst[15];
-    strcpy(src, inet_ntoa(paquete->src));
-    strcpy(dst, inet_ntoa(paquete->dst));
+    char src[INET_ADDRSTRLEN], dst[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &(paquete->src), src, INET_ADDRSTRLEN);
+    inet_ntop(AF_INET, &(paquete->dst), dst, INET_ADDRSTRLEN);
     printf("paquete src:%s, dst:%s, sport:%d, dport:%d, bytes:%d, \
 protocol:%d\n",
            src,
@@ -73,14 +74,14 @@ void bd_insertar(t_paquete *paquete) {
     /* Preparo sentencia insert */
     EXEC SQL PREPARE _insert FROM :_insert_stmt;
     /* Preparo parametros */
-    strcpy(_src, inet_ntoa(paquete->src));
-    strcpy(_dst, inet_ntoa(paquete->dst));
+    inet_ntop(AF_INET, &(paquete->src), _src, INET_ADDRSTRLEN);
+    inet_ntop(AF_INET, &(paquete->dst), _dst, INET_ADDRSTRLEN);
+    assert(strlen(_src) > 0);
+    assert(strlen(_dst) > 0);
     _sport = paquete->sport;
     _dport = paquete->dport;
     _bytes = paquete->bytes;
     _protocol = paquete->protocol;
-    assert(strlen(_src) > 0);
-    assert(strlen(_dst) > 0);
     /* Ejecuto sentencia */
     EXEC SQL EXECUTE _insert
          USING :_src, :_dst, :_sport, :_dport, :_bytes, :_protocol;
