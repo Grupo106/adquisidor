@@ -155,7 +155,7 @@ void captura_inicio() {
         exit(EXIT_FAILURE);
     }
     /* Capturando paquetes */
-    syslog(LOG_INFO, "Esperando paquetes con filtro: %s\n", FILTER);
+    syslog(LOG_INFO, "Iniciando captura de paquetes con filtro: %s\n", FILTER);
     pcap_loop(__handle, 0, procesar_paquete, NULL);
 }
 
@@ -167,4 +167,5 @@ void captura_inicio() {
 void captura_fin() {
     pcap_freecode(&__fp);
     pcap_close(__handle);
+    syslog(LOG_INFO, "Captura terminada");
 }

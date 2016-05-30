@@ -52,7 +52,8 @@ R_EPCG_FLAGS := -D"POSTGRES_CONNECTION_STRING=\"postgres@172.17.0.2\"" \
 # * flash de ecpg de desarrollo
 D_EPCG_FLAGS := -D"POSTGRES_CONNECTION_STRING=\"postgres@172.17.0.2\"" \
               -D"POSTGRES_USER=\"postgres\"" \
-              -D"POSTGRES_PASSWD=\"root\""
+              -D"POSTGRES_PASSWD=\"root\"" \
+						  -D"DEBUG"
 
 # Archivos de codigo fuente
 # ---------------------------------------------------------------------------

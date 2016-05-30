@@ -58,7 +58,6 @@ int main() {
     manejar_interrupciones();
     /* muestro informacion del build */
     syslog(LOG_INFO, "Revision: %s (%s)", REVISION, BUILD_MODE);
-    syslog(LOG_INFO, "Iniciando captura.");
     /* inicio captura de paquete de red */
     captura_inicio();
     return EXIT_SUCCESS;
@@ -73,7 +72,6 @@ static void terminar(int signum) {
     syslog(LOG_WARNING, "Interrupción recibida %d\n", signum);
     bd_desconectar();
     captura_fin();
-    syslog(LOG_INFO, "Captura terminada");
     closelog();
     exit(EXIT_SUCCESS);
 }
