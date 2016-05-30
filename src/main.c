@@ -12,13 +12,13 @@
 
 #ifndef PROGRAM
     #define PROGRAM "adquisidor"
-#endif /* REVISION */
+#endif /* PROGRAM */
 
 #ifdef DEBUG
     #define BUILD_MODE "desarrollo"
 #else
     #define BUILD_MODE "produccion"
-#endif /* REVISION */
+#endif /* BUILD_MODE */
 
 /**
 * terminar()
