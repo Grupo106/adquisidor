@@ -6,39 +6,51 @@ PROGRAM := adquisidor
 
 # Directorios
 # ---------------------------------------------------------------------------
+# * carpeta donde se encuentra el codigo fuente
 SRC_DIR := src
+# * carpeta donde se crearan los archivos de codigo objeto y todos aquellos
+# temporales necesarios para la construccion del binario
 BUILD_DIR := build
+# * carpeta donde se crearan los binararios
 BIN_DIR := bin
+# * carpeta donde se instalarán los binarios productivos
 INSTALL_DIR := /usr/local/sbin
+# * carpeta dentro de BIN_DIR donde se almacenaran los binarios productivos
 RELEASE_DIR := release
+# * carpeta dentro de BIN_DIR donde se almacenaran los binarios de desarrollo
 DEBUG_DIR := debug
 
 # Binarios
 # ---------------------------------------------------------------------------
+# * programa para compilar los archivos .pgc
 ECPG := $(shell which ecpg)
+# * programa para compilar los archivos .c
 CC := $(shell which gcc)
 
 # Versiones
 # ---------------------------------------------------------------------------
-
-# obtiene la revision desde el ultimo commit
+# * obtiene la revision desde el ultimo commit
 REVISION := $(shell git describe --tags)
 
 # FLAGS
 # ---------------------------------------------------------------------------
-# flash de gcc
+# * flags de gcc
 C_FLAGS := -Wall -Wextra \
           -D"REVISION=\"$(REVISION)\"" \
 					-D"PROGRAM=\"$(PROGRAM)\"" \
 					-I/usr/include/postgresql
-# flags de produccion
+# * flags de produccion
 R_FLAGS := -O3
-# flags de desarrollo
+# * flags de desarrollo
 D_FLAGS := -g -D"DEBUG"
-# flash de link final
+# * flash de link final
 LINK_FLAGS := -lecpg -lpcap
-# flash de ecpg
-EPCG_FLAGS := -D"POSTGRES_CONNECTION_STRING=\"postgres@172.17.0.2\"" \
+# * flash de ecpg de produccion
+R_EPCG_FLAGS := -D"POSTGRES_CONNECTION_STRING=\"postgres@172.17.0.2\"" \
+              -D"POSTGRES_USER=\"postgres\"" \
+              -D"POSTGRES_PASSWD=\"root\""
+# * flash de ecpg de desarrollo
+D_EPCG_FLAGS := -D"POSTGRES_CONNECTION_STRING=\"postgres@172.17.0.2\"" \
               -D"POSTGRES_USER=\"postgres\"" \
               -D"POSTGRES_PASSWD=\"root\""
 
@@ -54,9 +66,11 @@ PGC_SOURCES := $(shell find $(SRC_DIR) -name '*.pgc' -printf '%T@\t%p\n' \
 OBJECTS := $(C_SOURCES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 OBJECTS += $(PGC_SOURCES:$(SRC_DIR)/%.pgc=$(BUILD_DIR)/%.o)
 
-# Version de produccion y de debug
+# Variables dependientes del modo de compilacion (desarrollo o produccion)
 release: export CFLAGS := $(CFLAGS) $(C_FLAGS) $(R_FLAGS)
 debug: export CFLAGS := $(CFLAGS) $(C_FLAGS) $(D_FLAGS)
+release: export EPGCFLAGS := $(EPCGFLAGS) $(EPCG_FLAGS) $(R_EPCG_FLAGS)
+debug: export EPGCEFLAGS := $(EPCGFLAGS) $(EPCG_FLAGS) $(D_EPCG_FLAGS)
 release: export BIN_PATH := $(BIN_DIR)/$(RELEASE_DIR)
 debug: export BIN_PATH := $(BIN_DIR)/$(DEBUG_DIR)
 
@@ -113,5 +127,5 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 # ---------------------------------------------------------------------------
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.pgc
 	@echo "Compilando $<"
-	@$(ECPG) $(EPCG_FLAGS) -o $(BUILD_DIR)/$*.c $<
+	@$(ECPG) $(EPCGFLAGS) -o $(BUILD_DIR)/$*.c $<
 	@$(CC) $(CFLAGS) -I$(SRC_DIR) -o $@ -c $(BUILD_DIR)/$*.c
