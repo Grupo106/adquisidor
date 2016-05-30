@@ -60,8 +60,13 @@ clean: banner
 
 # Instala binarios en el host (requiere privilegios de root)
 install: banner
-	cp $(BIN_DIR)/$(PROGRAM) $(INSTALL_DIR)
+	install $(BIN_DIR)/$(PROGRAM) $(INSTALL_DIR)
 	@echo "$(PROGRAM) instalado correctamente"
+
+# Desinstala binarios en el host (requiere privilegios de root)
+uninstall: banner
+	rm -f $(INSTALL_DIR)/$(PROGRAM)
+	@echo "$(PROGRAM) desinstalado correctamente"
 
 banner:
 	@echo $(BANNER)
