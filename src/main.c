@@ -98,8 +98,8 @@ void manejar_interrupciones() {
 void banner() {
     printf("\
 ---------------------------------------------------------------------------\n\
-Grupo 106 - Universidad Nacional de La Matanza. 2016                       \n\
-%s - Revision: %s (%s)                                                     \n\
+Grupo 106 - Universidad Nacional de La Matanza. 2016\n\
+%s - Revision: %s (%s)\n\
 ---------------------------------------------------------------------------\n",
      PROGRAM, REVISION, BUILD_MODE);
 }
