@@ -65,7 +65,7 @@ static void terminar(int signum) {
     fprintf(stderr, "Interrupción recibida %d\n", signum);
     bd_desconectar();
     captura_fin();
-    //closelog();
+    exit(EXIT_SUCCESS);
 }
 
 /**
