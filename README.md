@@ -21,7 +21,7 @@ apt-get install libpcap-dev posgresql-dev
 Compilación e instalación
 -------------------------------------------------------
 ```sh
-make
+make release
 make install
 ```
 
