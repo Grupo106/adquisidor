@@ -71,7 +71,7 @@ OBJECTS += $(PGC_SOURCES:$(SRC_DIR)/%.pgc=$(BUILD_DIR)/%.o)
 release: export CFLAGS := $(CFLAGS) $(C_FLAGS) $(R_FLAGS)
 debug: export CFLAGS := $(CFLAGS) $(C_FLAGS) $(D_FLAGS)
 release: export EPGCFLAGS := $(EPCGFLAGS) $(EPCG_FLAGS) $(R_EPCG_FLAGS)
-debug: export EPGCEFLAGS := $(EPCGFLAGS) $(EPCG_FLAGS) $(D_EPCG_FLAGS)
+debug: export EPGCFLAGS := $(EPCGFLAGS) $(EPCG_FLAGS) $(D_EPCG_FLAGS)
 release: export BIN_PATH := $(BIN_DIR)/$(RELEASE_DIR)
 debug: export BIN_PATH := $(BIN_DIR)/$(DEBUG_DIR)
 
@@ -128,5 +128,5 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 # ---------------------------------------------------------------------------
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.pgc
 	@echo "Compilando $<"
-	@$(ECPG) $(EPCGFLAGS) -o $(BUILD_DIR)/$*.c $<
+	$(ECPG) $(EPGCFLAGS) -o $(BUILD_DIR)/$*.c $<
 	@$(CC) $(CFLAGS) -I$(SRC_DIR) -o $@ -c $(BUILD_DIR)/$*.c
