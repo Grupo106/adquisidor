@@ -84,11 +84,11 @@ OBJECTS += $(PGC_SOURCES:$(SRC_DIR)/%.pgc=$(BUILD_PATH)/%.o)
 # Acciones
 # ---------------------------------------------------------------------------
 release: banner
-	@echo "Empezando construccion en modo produccion"
+	@echo "Empezando construcción en modo PRODUCCIÓN"
 	@$(MAKE) all --no-print-directory
 
 debug: banner
-	@echo "Empezando construccion en modo desarrollo"
+	@echo "Empezando construcción en modo DESARROLLO"
 	@$(MAKE) all --no-print-directory
 
 # Compila todos los binarios
