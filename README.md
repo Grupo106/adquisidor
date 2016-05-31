@@ -2,7 +2,14 @@
 
 adquisidor
 ======================================================
-Adquisidor de datos. Captura, procesa y guarda datos de paquetes de red en la base de datos
+> Adquisidor de datos. Captura, procesa y guarda datos de paquetes de red en la base de datos
+
+
+Funcionalidades
+------------------------------------------------------
+* Captura, procesa y guarda datos de paquetes en la base de datos
+* Conexion a la base de datos parametrizable en tiempo de compilación
+* Genera mensajes de log a través del syslog del sistema
 
 
 Dependencias
