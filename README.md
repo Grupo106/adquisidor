@@ -40,5 +40,5 @@ Ver logs
 Para ver logs generados por la aplicación se puede utilizar el journalctl
 provisto por systemd
 ```
-journalctl -t adquisidor -f
+journalctl /usr/local/sbin/adquisidor -f
 ```
