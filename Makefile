@@ -15,9 +15,11 @@ BUILD_DIR := build
 BIN_DIR := bin
 # * carpeta donde se instalarán los binarios productivos
 INSTALL_DIR := /usr/local/sbin
-# * carpeta dentro de BIN_DIR donde se almacenaran los binarios productivos
+# * carpeta dentro de BIN_DIR y BUILD_DIR donde se almacenaran los binarios
+# productivos
 RELEASE_DIR := release
-# * carpeta dentro de BIN_DIR donde se almacenaran los binarios de desarrollo
+# * carpeta dentro de BIN_DIR y BUILD_DIR donde se almacenaran los binarios de
+# desarrollo
 DEBUG_DIR := debug
 
 # Binarios
@@ -36,9 +38,9 @@ REVISION := $(shell git describe --tags)
 # ---------------------------------------------------------------------------
 # * flags de gcc
 C_FLAGS := -Wall -Wextra \
-          -D"REVISION=\"$(REVISION)\"" \
-					-D"PROGRAM=\"$(PROGRAM)\"" \
-					-I/usr/include/postgresql
+			-D"REVISION=\"$(REVISION)\"" \
+			-D"PROGRAM=\"$(PROGRAM)\"" \
+			-I/usr/include/postgresql
 # * flags de produccion
 R_FLAGS := -O3
 # * flags de desarrollo
@@ -62,19 +64,25 @@ C_SOURCES := $(shell find $(SRC_DIR) -name '*.c' -printf '%T@\t%p\n' \
 PGC_SOURCES := $(shell find $(SRC_DIR) -name '*.pgc' -printf '%T@\t%p\n' \
 				 | sort -k 1nr | cut -f2-)
 
-# Archivos objeto
-# ---------------------------------------------------------------------------
-OBJECTS := $(C_SOURCES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
-OBJECTS += $(PGC_SOURCES:$(SRC_DIR)/%.pgc=$(BUILD_DIR)/%.o)
 
 # Variables dependientes del modo de compilacion (desarrollo o produccion)
+# ---------------------------------------------------------------------------
 release: export CFLAGS := $(CFLAGS) $(C_FLAGS) $(R_FLAGS)
-debug: export CFLAGS := $(CFLAGS) $(C_FLAGS) $(D_FLAGS)
 release: export EPGCFLAGS := $(EPCGFLAGS) $(EPCG_FLAGS) $(R_EPCG_FLAGS)
-debug: export EPGCFLAGS := $(EPCGFLAGS) $(EPCG_FLAGS) $(D_EPCG_FLAGS)
 release: export BIN_PATH := $(BIN_DIR)/$(RELEASE_DIR)
+release: export BUILD_PATH := $(BUILD_DIR)/$(RELEASE_DIR)
+debug: export CFLAGS := $(CFLAGS) $(C_FLAGS) $(D_FLAGS)
+debug: export EPGCFLAGS := $(EPCGFLAGS) $(EPCG_FLAGS) $(D_EPCG_FLAGS)
 debug: export BIN_PATH := $(BIN_DIR)/$(DEBUG_DIR)
+debug: export BUILD_PATH := $(BUILD_DIR)/$(DEBUG_DIR)
 
+# Archivos objeto
+# ---------------------------------------------------------------------------
+OBJECTS = $(C_SOURCES:$(SRC_DIR)/%.c=$(BUILD_PATH)/%.o)
+OBJECTS += $(PGC_SOURCES:$(SRC_DIR)/%.pgc=$(BUILD_PATH)/%.o)
+
+# Acciones
+# ---------------------------------------------------------------------------
 release: banner
 	@echo "Empezando construccion en modo produccion"
 	@$(MAKE) all --no-print-directory
@@ -89,7 +97,7 @@ all: dirs $(BIN_PATH)/$(PROGRAM)
 
 # Crea los directorios necesarios
 dirs:
-	@mkdir -p $(BUILD_DIR) $(BIN_PATH)
+	@mkdir -p $(BUILD_PATH) $(BIN_PATH)
 
 # Limpia archivos generados por el make
 clean: banner
@@ -112,21 +120,21 @@ banner:
 
 .PHONY: all dirs clean install banner debug release
 
-# Compilacion final
-# ---------------------------------------------------------------------------
-$(BIN_PATH)/$(PROGRAM): $(OBJECTS)
-	@echo "Construyendo $@"
-	@$(CC) $(LINK_FLAGS) -o $@ $(OBJECTS)
-
 # Compilacion de archivos .c
 # ---------------------------------------------------------------------------
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+$(BUILD_PATH)/%.o: $(SRC_DIR)/%.c
 	@echo "Compilando $<"
 	@$(CC) $(CFLAGS) -o $@ -c $<
 
 # Compilacion de archivos .pgc (postgresql embebido en C)
 # ---------------------------------------------------------------------------
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.pgc
+$(BUILD_PATH)/%.o: $(SRC_DIR)/%.pgc
 	@echo "Compilando $<"
-	@$(ECPG) $(EPGCFLAGS) -o $(BUILD_DIR)/$*.c $<
-	@$(CC) $(CFLAGS) -I$(SRC_DIR) -o $@ -c $(BUILD_DIR)/$*.c
+	@$(ECPG) $(EPGCFLAGS) -o $(BUILD_PATH)/$*.c $<
+	@$(CC) $(CFLAGS) -I$(SRC_DIR) -o $@ -c $(BUILD_PATH)/$*.c
+#
+# Compilacion final
+# ---------------------------------------------------------------------------
+$(BIN_PATH)/$(PROGRAM): $(OBJECTS)
+	@echo "Construyendo $@"
+	@$(CC) $(LINK_FLAGS) -o $@ $(OBJECTS)
