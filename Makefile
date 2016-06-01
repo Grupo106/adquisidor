@@ -52,9 +52,9 @@ R_EPCG_FLAGS := -D"POSTGRES_CONNECTION_STRING=\"unix:postgresql://localhost/$(PO
               -D"POSTGRES_USER=\"$(POSTGRESQL_USER)\"" \
               -D"POSTGRES_PASSWD=\"$(POSTGRESQL_PASSWORD)\""
 # * flash de ecpg de desarrollo
-D_EPCG_FLAGS := -D"POSTGRES_CONNECTION_STRING=\"postgres@172.17.0.2\"" \
+D_EPCG_FLAGS := -D"POSTGRES_CONNECTION_STRING=\"postgres@localhost\"" \
               -D"POSTGRES_USER=\"postgres\"" \
-              -D"POSTGRES_PASSWD=\"root\"" \
+              -D"POSTGRES_PASSWD=\"postgres\"" \
 						  -D"DEBUG"
 
 # Archivos de codigo fuente
