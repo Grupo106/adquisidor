@@ -48,9 +48,9 @@ D_FLAGS := -g -D"DEBUG"
 # * flash de link final
 LINK_FLAGS := -lecpg -lpcap
 # * flash de ecpg de produccion
-R_EPCG_FLAGS := -D"POSTGRES_CONNECTION_STRING=\"postgres@172.17.0.2\"" \
-              -D"POSTGRES_USER=\"postgres\"" \
-              -D"POSTGRES_PASSWD=\"root\""
+R_EPCG_FLAGS := -D"POSTGRES_CONNECTION_STRING=\"unix:postgresql://localhost/$(POSTGRESQL_DB)\"" \
+              -D"POSTGRES_USER=\"$(POSTGRESQL_USER)\"" \
+              -D"POSTGRES_PASSWD=\"$(POSTGRESQL_PASSWORD)\""
 # * flash de ecpg de desarrollo
 D_EPCG_FLAGS := -D"POSTGRES_CONNECTION_STRING=\"postgres@172.17.0.2\"" \
               -D"POSTGRES_USER=\"postgres\"" \
