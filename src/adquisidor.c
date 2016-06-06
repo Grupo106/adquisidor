@@ -100,7 +100,7 @@ void procesar_tcp(const u_char *tcp, t_paquete *paquete) {
     /* obtengo puerto de destino */
     paquete->dport = ntohs(p_tcp->dest);
     /* establezco que el protocolo es TCP */
-    paquete->protocol = SOL_TCP;
+    paquete->protocol = IPPROTO_TCP;
 }
 
 /*
@@ -115,7 +115,7 @@ void procesar_udp(const u_char *udp, t_paquete *paquete) {
     /* obtengo puerto de destino */
     paquete->dport = ntohs(p_udp->dest);
     /* establezco que el protocolo es UDP */
-    paquete->protocol = SOL_UDP;
+    paquete->protocol = IPPROTO_UDP;
 }
 
 /**
