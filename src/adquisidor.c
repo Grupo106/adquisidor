@@ -46,35 +46,42 @@ void procesar_paquete(u_char *args,
                       const struct pcap_pkthdr *header,
                       const u_char *packet)
 {
-    UNUSED(args); /* marco args como parametro no utilizado */
-    UNUSED(header); /* marco header como parametro no utilizado */
     struct ip *p_ip = NULL;
     t_paquete paquete;
     int header_size;
 
+    /* marco parametros no utilizado */
+    UNUSED(args); 
+    UNUSED(header);
+
     /* Obtengo la cabecera IP. Se le suma ETH_HLEN (14 bytes) que representan
-    * la cabecera Ethernet, que en este caso la vamos a ignorar.
-    */
+     * la cabecera Ethernet, que en este caso la vamos a ignorar.
+     */
     p_ip = (struct ip*) (packet + ETH_HLEN);
 
     /* Calculo el tamaño en bytes de la cabecera IP. Dicho tamaño lo da la
-    * cabecera IP en el campo Header Lenght como cantidad de palabras de
-    * 4 bytes. Es por ello que se multiplica por 4 para obtener la cantidad
-    * de bytes a desplazar
-    */
+     * cabecera IP en el campo Header Lenght como cantidad de palabras de
+     * 4 bytes. Es por ello que se multiplica por 4 para obtener la cantidad
+     * de bytes a desplazar.
+     */
     header_size = p_ip->ip_hl * 4;
 
-    /*
-    * obtengo direccion ip de origen y destino y la cantidad total del paquete
-    * ip
-    */
+    /* Si la cabecera es menor a 20 bytes el paquete está malformado (puede ser
+     * por un error de transmision). El paquete es descartado. 
+     */
+    if (header_size < 20) {
+        syslog(LOG_WARNING, "Paquete malformado cabecera IP menor a 20 bytes");
+        return;
+    }
+
+    /* Obtengo direccion ip de origen y destino y la cantidad total del paquete
+     * ip.
+     */
     paquete.src = p_ip->ip_src;
     paquete.dst = p_ip->ip_dst;
     paquete.bytes = ntohs(p_ip->ip_len);
 
-    /*
-    * obtengo informacion de la capa de transporte
-    */
+    /* Obtengo informacion de la capa de transporte */
     if (p_ip->ip_p == IPPROTO_TCP) {
         procesar_tcp(packet + ETH_HLEN + header_size, &paquete);
     } /* Si el paquete es TCP */
@@ -128,6 +135,7 @@ void captura_inicio() {
     char *dev;
     char errbuf[PCAP_ERRBUF_SIZE];
 
+    /* Inicializar captura de paquetes */
     dev = pcap_lookupdev(errbuf);
     if (dev == NULL) {
         fprintf(stderr, "No se puede encontrar la interfaz: %s\n", errbuf);
@@ -145,13 +153,13 @@ void captura_inicio() {
         exit(EXIT_FAILURE);
     }
     if (pcap_compile(__handle, &__fp, FILTER, 0, PCAP_NETMASK_UNKNOWN) == -1) {
-        syslog(LOG_CRIT, "No se puede parsear el filtro '%s': %s\n",
-                FILTER, pcap_geterr(__handle));
+        syslog(LOG_CRIT, "No se puede parsear el filtro '%s': %s\n", FILTER,
+               pcap_geterr(__handle));
         exit(EXIT_FAILURE);
     }
     if (pcap_setfilter(__handle, &__fp) == -1) {
-        syslog(LOG_CRIT, "No se puede instalar el filtro '%s': %s\n",
-                FILTER, pcap_geterr(__handle));
+        syslog(LOG_CRIT, "No se puede instalar el filtro '%s': %s\n", FILTER,
+               pcap_geterr(__handle));
         exit(EXIT_FAILURE);
     }
     /* Capturando paquetes */

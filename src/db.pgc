@@ -40,14 +40,13 @@ void imprimir(t_paquete *paquete) {
     char src[INET_ADDRSTRLEN], dst[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &(paquete->src), src, INET_ADDRSTRLEN);
     inet_ntop(AF_INET, &(paquete->dst), dst, INET_ADDRSTRLEN);
-    printf("paquete src:%s, dst:%s, sport:%d, dport:%d, bytes:%d, \
-protocol:%d\n",
+    printf("%s - %15s:%-5d -> %15s:%-5d - %d bytes\n",
+           paquete->protocol == 6 ? "TCP" : "UDP",
            src,
-           dst,
            paquete->sport,
+           dst,
            paquete->dport,
-           paquete->bytes,
-           paquete->protocol);
+           paquete->bytes);
 }
 
 /**
