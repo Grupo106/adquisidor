@@ -75,10 +75,10 @@ void procesar_paquete(u_char *args,
     /*
     * obtengo informacion de la capa de transporte
     */
-    if (p_ip->ip_p == SOL_TCP) {
+    if (p_ip->ip_p == IPPROTO_TCP) {
         procesar_tcp(packet + ETH_HLEN + header_size, &paquete);
     } /* Si el paquete es TCP */
-    else if (p_ip->ip_p == SOL_UDP) {
+    else if (p_ip->ip_p == IPPROTO_UDP) {
         procesar_udp(packet + ETH_HLEN + header_size, &paquete);
     } /* Si el paquete es UDP */
 

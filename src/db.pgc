@@ -85,8 +85,8 @@ void bd_insertar(t_paquete *paquete) {
     /* Preparo parametros */
     inet_ntop(AF_INET, &(paquete->src), _src, INET_ADDRSTRLEN);
     inet_ntop(AF_INET, &(paquete->dst), _dst, INET_ADDRSTRLEN);
-    assert(strlen(_src) > 0);
-    assert(strlen(_dst) > 0);
+    assert(*_src);
+    assert(*_dst);
     _sport = paquete->sport;
     _dport = paquete->dport;
     _bytes = paquete->bytes;
