@@ -10,7 +10,8 @@
 #include "db.h"
 #include "paquete.h"
 
-#define FILTER "tcp or udp"
+#define FILTER_INBOUND "inbound and (tcp or udp)"
+#define FILTER_OUTBOUND "outbound and (tcp or udp)"
 
 /**
 * UNUSED(x)
@@ -51,7 +52,7 @@ void procesar_paquete(u_char *args,
     int header_size;
 
     /* marco parametros no utilizado */
-    UNUSED(args); 
+    UNUSED(args);
     UNUSED(header);
 
     /* Obtengo la cabecera IP. Se le suma ETH_HLEN (14 bytes) que representan
@@ -67,7 +68,7 @@ void procesar_paquete(u_char *args,
     header_size = p_ip->ip_hl * 4;
 
     /* Si la cabecera es menor a 20 bytes el paquete está malformado (puede ser
-     * por un error de transmision). El paquete es descartado. 
+     * por un error de transmision). El paquete es descartado.
      */
     if (header_size < 20) {
         syslog(LOG_WARNING, "Paquete malformado cabecera IP menor a 20 bytes");
@@ -134,6 +135,7 @@ void procesar_udp(const u_char *udp, t_paquete *paquete) {
 void captura_inicio() {
     char *dev;
     char errbuf[PCAP_ERRBUF_SIZE];
+    char filter[] = FILTER_INBOUND;
 
     /* Inicializar captura de paquetes */
     dev = pcap_lookupdev(errbuf);
@@ -152,18 +154,19 @@ void captura_inicio() {
         syslog(LOG_CRIT, "La interfaz %s no provee cabeceras Ethernet", dev);
         exit(EXIT_FAILURE);
     }
-    if (pcap_compile(__handle, &__fp, FILTER, 0, PCAP_NETMASK_UNKNOWN) == -1) {
-        syslog(LOG_CRIT, "No se puede parsear el filtro '%s': %s\n", FILTER,
-               pcap_geterr(__handle));
+    if (pcap_compile(__handle, &__fp, filter, 0, PCAP_NETMASK_UNKNOWN) == -1) {
+        syslog(LOG_CRIT, "No se puede parsear el filtro '%s': %s\n",
+               filter, pcap_geterr(__handle));
         exit(EXIT_FAILURE);
     }
     if (pcap_setfilter(__handle, &__fp) == -1) {
-        syslog(LOG_CRIT, "No se puede instalar el filtro '%s': %s\n", FILTER,
-               pcap_geterr(__handle));
+        syslog(LOG_CRIT, "No se puede instalar el filtro '%s': %s\n",
+               filter, pcap_geterr(__handle));
         exit(EXIT_FAILURE);
     }
     /* Capturando paquetes */
-    syslog(LOG_INFO, "Iniciando captura de paquetes con filtro: %s\n", FILTER);
+    syslog(LOG_INFO, "Iniciando captura de paquetes con filtro: %s\n",
+           filter);
     pcap_loop(__handle, 0, procesar_paquete, NULL);
 }
 
