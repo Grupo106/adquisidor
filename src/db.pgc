@@ -83,8 +83,8 @@ void bd_insertar(struct paquete *paquete) {
     /* Preparo sentencia insert */
     EXEC SQL PREPARE _insert FROM :_insert_stmt;
     /* Preparo parametros */
-    _src = paquete->src.s_addr;
-    _dst = paquete->dst.s_addr;
+    _src = ntohl(paquete->src.s_addr);
+    _dst = ntohl(paquete->dst.s_addr);
     _sport = paquete->sport;
     _dport = paquete->dport;
     _bytes = paquete->bytes;
@@ -98,7 +98,7 @@ void bd_insertar(struct paquete *paquete) {
                                    :_protocol;
     /* Libero recursos */
     EXEC SQL DEALLOCATE PREPARE _insert;
-    #ifndef NDEBUG
+    #ifdef DEBUG
         imprimir(paquete);
     #endif
 }
