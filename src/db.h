@@ -18,12 +18,12 @@ int bd_conectar();
 void bd_desconectar();
 
 /**
- * bd_insertar(t_paquete*)
+ * bd_insertar(struct paquete*)
  * -------------------------------------------------------------------------
  * Inserta un paquete en el almacen de datos.
  * Luego de insertar los paquetes es necesario hacer un commit()
  */
-void bd_insertar(t_paquete *paquete);
+void bd_insertar(struct paquete*);
 
 /**
  * bd_commit()

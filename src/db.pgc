@@ -35,7 +35,7 @@ EXEC SQL WHENEVER SQLWARNING SQLPRINT;
 * ---------------------------------------------------------------------------
 * Imprime paquete en la salida estandar
 */
-void imprimir(t_paquete *paquete) {
+void imprimir(struct paquete *paquete) {
     // imprimir paquete
     char src[INET_ADDRSTRLEN], dst[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &(paquete->src), src, INET_ADDRSTRLEN);
@@ -77,7 +77,7 @@ void bd_desconectar() {
  * Inserta un paquete en el almacen de datos.
  * Luego de insertar los paquetes es necesario hacer un commit()
  */
-void bd_insertar(t_paquete *paquete) {
+void bd_insertar(struct paquete *paquete) {
     assert(paquete != NULL);
     /* Preparo sentencia insert */
     EXEC SQL PREPARE _insert FROM :_insert_stmt;
@@ -92,8 +92,12 @@ void bd_insertar(t_paquete *paquete) {
     _bytes = paquete->bytes;
     _protocol = paquete->protocol;
     /* Ejecuto sentencia */
-    EXEC SQL EXECUTE _insert
-         USING :_src, :_dst, :_sport, :_dport, :_bytes, :_protocol;
+    EXEC SQL EXECUTE _insert USING :_src, 
+                                   :_dst, 
+                                   :_sport, 
+                                   :_dport,
+                                   :_bytes,
+                                   :_protocol;
     /* Libero recursos */
     EXEC SQL DEALLOCATE PREPARE _insert;
     #ifdef DEBUG

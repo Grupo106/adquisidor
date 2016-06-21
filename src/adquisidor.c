@@ -28,7 +28,7 @@ struct bpf_program __fp;
 * Procesa un segmento TCP. Agrega informacion de la capa de transporte a la
 * estructura t_paquete
 */
-void procesar_tcp(const u_char *packet, t_paquete*);
+void procesar_tcp(const u_char *packet, struct paquete*);
 
 /*
 * procesar_udp
@@ -36,7 +36,7 @@ void procesar_tcp(const u_char *packet, t_paquete*);
 * Procesa un datagrama UDP. Agrega informacion de la capa de transporte a la
 * estructura t_paquete
 */
-void procesar_udp(const u_char *packet, t_paquete*);
+void procesar_udp(const u_char *packet, struct paquete*);
 
 /*
 * procesar_paquete
@@ -48,7 +48,7 @@ void procesar_paquete(u_char *args,
                       const u_char *packet)
 {
     struct ip *p_ip = NULL;
-    t_paquete paquete;
+    struct paquete paquete;
     int header_size;
 
     /* marco parametros no utilizado */
@@ -101,7 +101,7 @@ void procesar_paquete(u_char *args,
 * ---------------------------------------------------------------------------
 * Procesa un segmento TCP
 */
-void procesar_tcp(const u_char *tcp, t_paquete *paquete) {
+void procesar_tcp(const u_char *tcp, struct paquete *paquete) {
     struct tcphdr *p_tcp = (struct tcphdr*) tcp; /* Cabecera TCP */
     /* obtengo puerto de origen */
     paquete->sport = ntohs(p_tcp->source);
@@ -116,7 +116,7 @@ void procesar_tcp(const u_char *tcp, t_paquete *paquete) {
 * ---------------------------------------------------------------------------
 * Procesa un datagrama UDP
 */
-void procesar_udp(const u_char *udp, t_paquete *paquete) {
+void procesar_udp(const u_char *udp, struct paquete *paquete) {
     struct udphdr *p_udp = (struct udphdr*) udp; /* Cabecera UDP */
     /* obtengo puerto de origen */
     paquete->sport = ntohs(p_udp->source);
