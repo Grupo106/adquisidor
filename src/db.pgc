@@ -15,14 +15,15 @@
 void print_sqlca();
 
 EXEC SQL BEGIN DECLARE SECTION;
-    char _src[INET_ADDRSTRLEN],
-         _dst[INET_ADDRSTRLEN];
-    int _sport,
+    int _src,
+        _dst,
+        _sport,
         _dport,
         _bytes,
         _protocol;
     const char *_insert_stmt =
-    "INSERT INTO traffic (src, dst, sport, dport, bytes, protocol) \
+    "INSERT INTO paquetes (ip_origen, ip_destino, puerto_origen, \
+                           puerto_destino, bytes, protocolo) \
      VALUES(?, ?, ?, ?, ?, ?);";
 EXEC SQL END DECLARE SECTION;
 
@@ -82,11 +83,8 @@ void bd_insertar(struct paquete *paquete) {
     /* Preparo sentencia insert */
     EXEC SQL PREPARE _insert FROM :_insert_stmt;
     /* Preparo parametros */
-    inet_ntop(AF_INET, &(paquete->src), _src, INET_ADDRSTRLEN);
-    inet_ntop(AF_INET, &(paquete->dst), _dst, INET_ADDRSTRLEN);
-    /* Asumo que la direccion de origen y destino es distinto de null */
-    assert(*_src);
-    assert(*_dst);
+    _src = paquete->src.s_addr;
+    _dst = paquete->dst.s_addr;
     _sport = paquete->sport;
     _dport = paquete->dport;
     _bytes = paquete->bytes;
@@ -100,7 +98,7 @@ void bd_insertar(struct paquete *paquete) {
                                    :_protocol;
     /* Libero recursos */
     EXEC SQL DEALLOCATE PREPARE _insert;
-    #ifdef DEBUG
+    #ifndef NDEBUG
         imprimir(paquete);
     #endif
 }
