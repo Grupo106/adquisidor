@@ -1,3 +1,7 @@
+/**
+ * Compilar
+ * gcc -lpcap -I../src -g -Wl,--wrap=bd_insertar,--wrap=bd_commit ../src/adquisidor.c adquisidor_test.c
+ */
 #include <assert.h>
 
 #include <net/ethernet.h>
