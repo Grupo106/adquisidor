@@ -22,22 +22,6 @@
 pcap_t *__handle;
 struct bpf_program __fp;
 
-/**
-* procesar_tcp
-* ---------------------------------------------------------------------------
-* Procesa un segmento TCP. Agrega informacion de la capa de transporte a la
-* estructura t_paquete
-*/
-void procesar_tcp(const u_char *packet, struct paquete*);
-
-/*
-* procesar_udp
-* ---------------------------------------------------------------------------
-* Procesa un datagrama UDP. Agrega informacion de la capa de transporte a la
-* estructura t_paquete
-*/
-void procesar_udp(const u_char *packet, struct paquete*);
-
 /*
 * procesar_paquete
 * ---------------------------------------------------------------------------
