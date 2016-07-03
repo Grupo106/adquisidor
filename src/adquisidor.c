@@ -78,8 +78,8 @@ void procesar_paquete(u_char *args,
     /* Obtengo direccion ip de origen y destino y la cantidad total del paquete
      * ip.
      */
-    paquete.src = p_ip->ip_src;
-    paquete.dst = p_ip->ip_dst;
+    paquete.origen = p_ip->ip_src;
+    paquete.destino = p_ip->ip_dst;
     paquete.bytes = ntohs(p_ip->ip_len);
 
     /* Obtengo informacion de la capa de transporte */
@@ -104,11 +104,11 @@ void procesar_paquete(u_char *args,
 void procesar_tcp(const u_char *tcp, struct paquete *paquete) {
     struct tcphdr *p_tcp = (struct tcphdr*) tcp; /* Cabecera TCP */
     /* obtengo puerto de origen */
-    paquete->sport = ntohs(p_tcp->source);
+    paquete->puerto_origen = ntohs(p_tcp->source);
     /* obtengo puerto de destino */
-    paquete->dport = ntohs(p_tcp->dest);
+    paquete->puerto_destino = ntohs(p_tcp->dest);
     /* establezco que el protocolo es TCP */
-    paquete->protocol = IPPROTO_TCP;
+    paquete->protocolo = IPPROTO_TCP;
 }
 
 /*
@@ -119,11 +119,11 @@ void procesar_tcp(const u_char *tcp, struct paquete *paquete) {
 void procesar_udp(const u_char *udp, struct paquete *paquete) {
     struct udphdr *p_udp = (struct udphdr*) udp; /* Cabecera UDP */
     /* obtengo puerto de origen */
-    paquete->sport = ntohs(p_udp->source);
+    paquete->puerto_origen = ntohs(p_udp->source);
     /* obtengo puerto de destino */
-    paquete->dport = ntohs(p_udp->dest);
+    paquete->puerto_destino = ntohs(p_udp->dest);
     /* establezco que el protocolo es UDP */
-    paquete->protocol = IPPROTO_UDP;
+    paquete->protocolo = IPPROTO_UDP;
 }
 
 /**

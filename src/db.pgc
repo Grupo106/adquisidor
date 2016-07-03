@@ -14,18 +14,6 @@
  */
 void print_sqlca();
 
-EXEC SQL BEGIN DECLARE SECTION;
-    int _src,
-        _dst,
-        _sport,
-        _dport,
-        _bytes,
-        _protocol;
-    const char *_insert_stmt =
-    "INSERT INTO paquetes (ip_origen, ip_destino, puerto_origen, \
-                           puerto_destino, bytes, protocolo) \
-     VALUES(?, ?, ?, ?, ?, ?);";
-EXEC SQL END DECLARE SECTION;
 
 EXEC SQL WHENEVER SQLERROR CALL print_sqlca();
 EXEC SQL WHENEVER SQLWARNING SQLPRINT;
@@ -39,14 +27,14 @@ EXEC SQL WHENEVER SQLWARNING SQLPRINT;
 void imprimir(struct paquete *paquete) {
     // imprimir paquete
     char src[INET_ADDRSTRLEN], dst[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &(paquete->src), src, INET_ADDRSTRLEN);
-    inet_ntop(AF_INET, &(paquete->dst), dst, INET_ADDRSTRLEN);
+    inet_ntop(AF_INET, &(paquete->origen), src, INET_ADDRSTRLEN);
+    inet_ntop(AF_INET, &(paquete->destino), dst, INET_ADDRSTRLEN);
     printf("%s - %15s:%-5d -> %15s:%-5d - %d bytes\n",
-           paquete->protocol == 6 ? "TCP" : "UDP",
+           paquete->protocolo == 6 ? "TCP" : "UDP",
            src,
-           paquete->sport,
+           paquete->puerto_origen,
            dst,
-           paquete->dport,
+           paquete->puerto_destino,
            paquete->bytes);
 }
 
@@ -79,16 +67,29 @@ void bd_desconectar() {
  * Luego de insertar los paquetes es necesario hacer un commit()
  */
 void bd_insertar(struct paquete *paquete) {
+    /* declaro variables que seran usadas en la consulta SQL */
+    EXEC SQL BEGIN DECLARE SECTION;
+        int _src;
+        int _dst;
+        int _sport;
+        int _dport;
+        int _bytes;
+        int _protocol;
+        const char *_insert_stmt =
+        "INSERT INTO paquetes (ip_origen, ip_destino, puerto_origen, \
+                               puerto_destino, bytes, protocolo) \
+         VALUES(?, ?, ?, ?, ?, ?);";
+    EXEC SQL END DECLARE SECTION;
     assert(paquete != NULL);
     /* Preparo sentencia insert */
     EXEC SQL PREPARE _insert FROM :_insert_stmt;
     /* Preparo parametros */
-    _src = ntohl(paquete->src.s_addr);
-    _dst = ntohl(paquete->dst.s_addr);
-    _sport = paquete->sport;
-    _dport = paquete->dport;
+    _src = ntohl(paquete->origen.s_addr);
+    _dst = ntohl(paquete->destino.s_addr);
+    _sport = paquete->puerto_origen;
+    _dport = paquete->puerto_destino;
     _bytes = paquete->bytes;
-    _protocol = paquete->protocol;
+    _protocol = paquete->protocolo;
     /* Ejecuto sentencia */
     EXEC SQL EXECUTE _insert USING :_src, 
                                    :_dst, 
