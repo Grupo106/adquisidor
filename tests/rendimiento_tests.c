@@ -7,7 +7,7 @@
 #include "adquisidor.h"
 
 void main() {
-    int cantidad = 1800;
+    int cantidad = 1800, i;
     struct paquete paquete;
     paquete.src.s_addr = htonl(83886339);
     paquete.dst.s_addr = htonl(83888127);
@@ -20,4 +20,3 @@ void main() {
     bd_commit();
     bd_desconectar();
 }
-
