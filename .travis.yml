@@ -2,7 +2,7 @@ language: c
 addons:
   apt:
     packages:
-      - libpcap-dev
-      - postgresql-dev
+      - libpcap0.8-dev
+      - libecpg-dev
 build: make
 script: ./run_tests.sh
