@@ -29,13 +29,14 @@ void imprimir(struct paquete *paquete) {
     char src[INET_ADDRSTRLEN], dst[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &(paquete->origen), src, INET_ADDRSTRLEN);
     inet_ntop(AF_INET, &(paquete->destino), dst, INET_ADDRSTRLEN);
-    printf("%s - %15s:%-5d -> %15s:%-5d - %d bytes\n",
+    printf("%s - %15s:%-5d -> %15s:%-5d - %d bytes - %s\n",
            paquete->protocolo == 6 ? "TCP" : "UDP",
            src,
            paquete->puerto_origen,
            dst,
            paquete->puerto_destino,
-           paquete->bytes);
+           paquete->bytes,
+           paquete->direccion == OUTBOUND ? "outbound" : "inbound");
 }
 
 /**
@@ -75,10 +76,11 @@ void bd_insertar(struct paquete *paquete) {
         int _dport;
         int _bytes;
         int _protocol;
+        int _dir;
         const char *_insert_stmt =
         "INSERT INTO paquetes (ip_origen, ip_destino, puerto_origen, \
-                               puerto_destino, bytes, protocolo) \
-         VALUES(?, ?, ?, ?, ?, ?);";
+                               puerto_destino, bytes, protocolo, direccion) \
+         VALUES(?, ?, ?, ?, ?, ?, ?);";
     EXEC SQL END DECLARE SECTION;
     assert(paquete != NULL);
     /* Preparo sentencia insert */
@@ -90,13 +92,15 @@ void bd_insertar(struct paquete *paquete) {
     _dport = paquete->puerto_destino;
     _bytes = paquete->bytes;
     _protocol = paquete->protocolo;
+    _dir = paquete->direccion;
     /* Ejecuto sentencia */
     EXEC SQL EXECUTE _insert USING :_src, 
                                    :_dst, 
                                    :_sport, 
                                    :_dport,
                                    :_bytes,
-                                   :_protocol;
+                                   :_protocol,
+                                   :_dir;
     /* Libero recursos */
     EXEC SQL DEALLOCATE PREPARE _insert;
     #ifdef DEBUG

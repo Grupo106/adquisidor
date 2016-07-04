@@ -11,7 +11,7 @@
 #include "db.h"
 #include "paquete.h"
 
-#define FILTER_INBOUND "inbound and (tcp or udp)"
+#define FILTER "inbound and (tcp or udp)"
 
 /**
 * UNUSED(x)
@@ -22,7 +22,8 @@
 
 static pcap_t *__handle; /* Puntero necesario para capturar */
 static struct bpf_program __fp; /* Puntero necesario para capturar */
-static int cantidad = 0; /* Cantidad de paquetes capturados */
+static int __cantidad = 0; /* Cantidad de paquetes capturados */
+static const struct config *__cfg; /* Puntero hacia la configuracion */
 
 /*
 * procesar_paquete
@@ -36,7 +37,7 @@ void procesar_paquete(u_char *args,
     struct ip *p_ip = NULL;
     struct paquete paquete;
     int header_size;
-    cantidad++;
+    __cantidad++;
 
     /* marco parametros no utilizado */
     UNUSED(args);
@@ -62,12 +63,13 @@ void procesar_paquete(u_char *args,
         return;
     }
 
-    /* Obtengo direccion ip de origen y destino y la cantidad total del paquete
-     * ip.
+    /* Obtengo direccion ip de origen, destino, la cantidad de bytes total del
+     * paquete ip y la direccion del paquete
      */
     paquete.origen = p_ip->ip_src;
     paquete.destino = p_ip->ip_dst;
     paquete.bytes = ntohs(p_ip->ip_len);
+    paquete.direccion = __cfg->direccion;
 
     /* Obtengo informacion de la capa de transporte */
     if (p_ip->ip_p == IPPROTO_TCP) {
@@ -122,7 +124,7 @@ void procesar_udp(const u_char *udp, struct paquete *paquete) {
 void captura_inicio(const struct config *cfg) {
     char dev[DEVICE_LENGTH];
     char errbuf[PCAP_ERRBUF_SIZE];
-    char filter[] = FILTER_INBOUND;
+    __cfg = cfg;
 
     if (*(cfg->device)) {
         /* Establezco la interfaz seteada por parametro */
@@ -144,24 +146,25 @@ void captura_inicio(const struct config *cfg) {
     __handle = pcap_open_live(dev, BUFSIZ, 1, 100, errbuf);
     if (__handle == NULL) {
         syslog(LOG_CRIT, "No se puede abrir la interfaz: %s\n", errbuf);
+        fprintf(stderr, "No se puede abrir la interfaz: %s\n", errbuf);
         exit(EXIT_FAILURE);
     }
     /* Compilo el filtro */
-    if (pcap_compile(__handle, &__fp, filter, 0, PCAP_NETMASK_UNKNOWN) == -1) {
+    if (pcap_compile(__handle, &__fp, FILTER, 0, PCAP_NETMASK_UNKNOWN) == -1) {
         syslog(LOG_CRIT, "No se puede compilar el filtro '%s': %s\n",
-               filter, pcap_geterr(__handle));
+               FILTER, pcap_geterr(__handle));
         exit(EXIT_FAILURE);
     }
     /* Establezco el filtro de captura */
     if (pcap_setfilter(__handle, &__fp) == -1) {
         syslog(LOG_CRIT, "No se puede instalar el filtro '%s': %s\n",
-               filter, pcap_geterr(__handle));
+               FILTER, pcap_geterr(__handle));
         exit(EXIT_FAILURE);
     }
     /* Capturando paquetes */
     syslog(LOG_INFO, 
            "Iniciando captura de paquetes dispositivo: %s filtro: %s\n", 
-           dev, filter);
+           dev, FILTER);
     pcap_loop(__handle, 0, procesar_paquete, NULL);
 }
 
@@ -173,5 +176,5 @@ void captura_inicio(const struct config *cfg) {
 void captura_fin() {
     pcap_freecode(&__fp);
     pcap_close(__handle);
-    syslog(LOG_INFO, "Captura terminada. %d paquetes capturados", cantidad);
+    syslog(LOG_INFO, "Captura terminada. %d paquetes capturados", __cantidad);
 }

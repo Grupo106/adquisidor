@@ -123,20 +123,27 @@ Netcop - Universidad Nacional de La Matanza. 2016\n\
  */
 static void ayuda() {
     printf("\
-Este programa captura los paquetes entrantes de la interfaz pasada por\n\
-parametro. Si ninguna interfaz es establecida, se capturará en la primer\n\
+Este programa captura los paquetes ENTRANTES de la interfaz pasada por\n\
+parámetro. Si ninguna interfaz es establecida, se capturará en la primer\n\
 interfaz disponible.\n\
 \n\
 Uso: %s -h | -v \n\
      %s device outbound|inbound \n\
 \n\
--h  --help    Muestra esta ayuda.\n\
--v  --version Muestra numero de version.\n\
+-h --help     Muestra esta ayuda.\n\
+\n\
+-v --version  Muestra numero de version.\n\
+\n\
 device        Nombre de la interfaz en la que se capturarán los paquetes\n\
               entrantes\n\
+\n\
 outbound      Asume que los paquetes son desde la LAN hacia internet (por \n\
-              defecto)\n\
-inbound       Asume que los paquetes son desde Internet hacia la LAN\n\
+              defecto). Solo es util para el analizador\n\
+\n\
+inbound       Asume que los paquetes son desde Internet hacia la LAN. Solo\n\
+              es útl para el analizador.\n\
+\n\
+(c) Netcop. 2016\
 \n", PROGRAM, PROGRAM);
 }
 
