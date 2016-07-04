@@ -4,5 +4,6 @@ addons:
     packages:
       - libpcap-dev
       - libecpg-dev
-build: make
-script: ./run_tests.sh
+script: 
+  - make
+  - ./run_tests.sh
