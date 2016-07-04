@@ -2,7 +2,7 @@ language: c
 addons:
   apt:
     packages:
-      - libpcap0.8-dev
+      - libpcap-dev
       - libecpg-dev
 build: make
 script: ./run_tests.sh

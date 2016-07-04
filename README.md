@@ -25,7 +25,7 @@ sudo dnf install libpcap-devel postgresql-devel
 ### Debian
 
 ```sh
-apt-get install libpcap-dev postgresql-dev
+apt-get install libpcap0.8-dev libecpg-dev
 ```
 
 Compilación e instalación
