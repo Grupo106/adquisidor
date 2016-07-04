@@ -1,4 +1,7 @@
 language: c
-before_install:
-  - sudo apt-get install libpcap-dev posgresql-dev
+addons:
+  apt:
+    packages:
+      - libpcap-dev
+      - postgresql-dev
 script: ./run_tests.sh
