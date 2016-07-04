@@ -57,10 +57,10 @@ int main(int argc, const char* argv[]) {
     struct config cfg;
     /* Inicializo logs */
     openlog(PROGRAM, LOG_CONS | LOG_PID, LOG_LOCAL0);
-    /* Imprimo banner con version */
-    banner();
     /* Parseo argumentos */
     argumentos(argc, argv, &cfg);
+    /* Imprimo banner con version */
+    banner();
     /* muestro informacion del build */
     syslog(LOG_INFO, "Revision: %s (%s)", REVISION, BUILD_MODE);
     /* conecto base de datos */
@@ -127,10 +127,11 @@ Este programa captura los paquetes entrantes de la interfaz pasada por\n\
 parametro. Si ninguna interfaz es establecida, se capturará en la primer\n\
 interfaz disponible.\n\
 \n\
-Uso: %s -h \n\
+Uso: %s -h | -v \n\
      %s device outbound|inbound \n\
 \n\
 -h  --help    Muestra esta ayuda.\n\
+-v  --version Muestra numero de version.\n\
 device        Nombre de la interfaz en la que se capturarán los paquetes\n\
               entrantes\n\
 outbound      Asume que los paquetes son desde la LAN hacia internet (por \n\
@@ -158,6 +159,11 @@ static int argumentos(int argc, const char* argv[], struct config *cfg) {
             ayuda();
             exit(EXIT_SUCCESS);
         }
+        /* si el primer parametro es -v o --verson muestro version */
+        if(strcmp(argv[1], "-v") == 0|| strcmp(argv[1], "--version") == 0) {
+            printf("%s - %s - %s\n", PROGRAM, REVISION, BUILD_MODE);
+            exit(EXIT_SUCCESS);
+        }
         /* seteo la interfaz a escuchar */
         strncpy(cfg->device, argv[1], DEVICE_LENGTH);
     }
@@ -168,7 +174,7 @@ static int argumentos(int argc, const char* argv[], struct config *cfg) {
         } else if (strcmp(argv[2], "outbound") == 0) {
             cfg->direccion = OUTBOUND;
         } else {
-            fprintf(stderr, "%s: Parámetro desconocido", argv[2]);
+            fprintf(stderr, "%s: Parámetro desconocido\n", argv[2]);
             exit(EXIT_FAILURE);
         }
     }
