@@ -2,7 +2,7 @@
 BANNER = "$(PROGRAM) - Grupo 106 - Universidad Nacional de La Matanza. 2016"
 
 # Nombre del programa
-PROGRAM := analizador
+PROGRAM := adquisidor
 
 # Directorios
 # ---------------------------------------------------------------------------
