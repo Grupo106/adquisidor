@@ -4,4 +4,5 @@ addons:
     packages:
       - libpcap-dev
       - postgresql-dev
+build: make
 script: ./run_tests.sh

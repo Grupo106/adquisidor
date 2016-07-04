@@ -41,8 +41,8 @@ static void test_paquete_tcp() {
     capa3->ip_src.s_addr = inet_addr("192.168.10.1");
     capa3->ip_dst.s_addr = inet_addr("200.67.222.222");
     capa3->ip_len = htons(1500);
-    capa4->th_sport = htons(23412);
-    capa4->th_dport = htons(80);
+    capa4->source = htons(23412);
+    capa4->dest = htons(80);
 
     procesar_paquete(NULL, NULL, packet);
 }
