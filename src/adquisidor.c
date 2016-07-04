@@ -1,6 +1,7 @@
 #include <pcap.h>
 #include <stdlib.h>
 #include <syslog.h>
+#include <string.h>
 #include <net/ethernet.h>
 #include <netinet/ip.h>
 #include <netinet/udp.h>
@@ -19,8 +20,9 @@
 */
 #define UNUSED(x) (void)(x)
 
-static pcap_t *__handle;
-static struct bpf_program __fp;
+static pcap_t *__handle; /* Puntero necesario para capturar */
+static struct bpf_program __fp; /* Puntero necesario para capturar */
+static int cantidad = 0; /* Cantidad de paquetes capturados */
 
 /*
 * procesar_paquete
@@ -34,6 +36,7 @@ void procesar_paquete(u_char *args,
     struct ip *p_ip = NULL;
     struct paquete paquete;
     int header_size;
+    cantidad++;
 
     /* marco parametros no utilizado */
     UNUSED(args);
@@ -116,41 +119,49 @@ void procesar_udp(const u_char *udp, struct paquete *paquete) {
 * Captura, procesa y guarda información de los paquetes que atraviesan una
 * interfaz en la base de datos.
 */
-void captura_inicio() {
-    char *dev;
+void captura_inicio(const struct config *cfg) {
+    char dev[DEVICE_LENGTH];
     char errbuf[PCAP_ERRBUF_SIZE];
     char filter[] = FILTER_INBOUND;
 
-    /* Inicializar captura de paquetes */
-    dev = pcap_lookupdev(errbuf);
-    if (dev == NULL) {
-        fprintf(stderr, "No se puede encontrar la interfaz: %s\n", errbuf);
-        exit(EXIT_FAILURE);
+    if (*(cfg->device)) {
+        /* Establezco la interfaz seteada por parametro */
+        strncpy(dev, cfg->device, DEVICE_LENGTH);
+    }
+    else {
+        /* Si no se estableció ninguna interfaz, busco la primer interfaz 
+         * disponible.
+         */
+        strncpy(dev, pcap_lookupdev(errbuf), DEVICE_LENGTH);
+        if (dev == NULL) {
+            fprintf(stderr, "No se puede encontrar la interfaz: %s\n", errbuf);
+            exit(EXIT_FAILURE);
+        }
     }
     syslog(LOG_INFO, "Device: %s\n", dev);
 
+    /* Inicializa captura de paquetes */
     __handle = pcap_open_live(dev, BUFSIZ, 1, 100, errbuf);
     if (__handle == NULL) {
         syslog(LOG_CRIT, "No se puede abrir la interfaz: %s\n", errbuf);
         exit(EXIT_FAILURE);
     }
-    if (pcap_datalink(__handle) != DLT_EN10MB) {
-        syslog(LOG_CRIT, "La interfaz %s no provee cabeceras Ethernet", dev);
-        exit(EXIT_FAILURE);
-    }
+    /* Compilo el filtro */
     if (pcap_compile(__handle, &__fp, filter, 0, PCAP_NETMASK_UNKNOWN) == -1) {
-        syslog(LOG_CRIT, "No se puede parsear el filtro '%s': %s\n",
+        syslog(LOG_CRIT, "No se puede compilar el filtro '%s': %s\n",
                filter, pcap_geterr(__handle));
         exit(EXIT_FAILURE);
     }
+    /* Establezco el filtro de captura */
     if (pcap_setfilter(__handle, &__fp) == -1) {
         syslog(LOG_CRIT, "No se puede instalar el filtro '%s': %s\n",
                filter, pcap_geterr(__handle));
         exit(EXIT_FAILURE);
     }
     /* Capturando paquetes */
-    syslog(LOG_INFO, "Iniciando captura de paquetes con filtro: %s\n",
-           filter);
+    syslog(LOG_INFO, 
+           "Iniciando captura de paquetes dispositivo: %s filtro: %s\n", 
+           dev, filter);
     pcap_loop(__handle, 0, procesar_paquete, NULL);
 }
 
@@ -162,5 +173,5 @@ void captura_inicio() {
 void captura_fin() {
     pcap_freecode(&__fp);
     pcap_close(__handle);
-    syslog(LOG_INFO, "Captura terminada");
+    syslog(LOG_INFO, "Captura terminada. %d paquetes capturados", cantidad);
 }

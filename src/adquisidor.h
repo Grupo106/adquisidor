@@ -17,12 +17,15 @@ struct config {
 };
 
 /**
- * captura_inicio()
+ * captura_inicio(const struct config*)
  * --------------------------------------------------------------------------
  * Captura, procesa y guarda información de los paquetes que atraviesan una
  * interfaz en la base de datos.
+ * 
+ * Se debe pasar por parametro la estructura que contiene la configuracion de
+ * la aplicacion
  */
-void captura_inicio();
+void captura_inicio(const struct config*);
 
 /**
  * captura_fin()

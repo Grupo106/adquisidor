@@ -73,7 +73,7 @@ int main(int argc, const char* argv[]) {
      */
     manejar_interrupciones();
     /* inicio captura de paquete de red */
-    captura_inicio();
+    captura_inicio(&cfg);
     return EXIT_SUCCESS;
 }
 
