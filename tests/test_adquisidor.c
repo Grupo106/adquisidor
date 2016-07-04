@@ -12,19 +12,17 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
-#include <cmocka.h>
 
-#include "adquisidor_test.h"
-#include "adquisidor.h"
-#include "paquete.h"
+#include "../src/adquisidor.h"
+#include "../src/paquete.h"
 
 int __wrap_bd_insertar(struct paquete *paquete) {
-    assert(paquete->src.s_addr == inet_addr("192.168.10.1"));
-    assert(paquete->dst.s_addr == inet_addr("200.67.222.222"));
-    assert(paquete->sport == 23412);
-    assert(paquete->dport == 80);
+    assert(paquete->origen.s_addr == inet_addr("192.168.10.1"));
+    assert(paquete->destino.s_addr == inet_addr("200.67.222.222"));
+    assert(paquete->puerto_origen == 23412);
+    assert(paquete->puerto_destino == 80);
     assert(paquete->bytes == 1500);
-    assert(paquete->protocol == IPPROTO_TCP);
+    assert(paquete->protocolo == IPPROTO_TCP);
     return 0;
 }
 

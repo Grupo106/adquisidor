@@ -19,8 +19,9 @@
 * Macro que sirve para ignorar la advertencia por parametro no utilizado
 */
 #define UNUSED(x) (void)(x)
-pcap_t *__handle;
-struct bpf_program __fp;
+
+static pcap_t *__handle;
+static struct bpf_program __fp;
 
 /*
 * procesar_paquete
