@@ -4,6 +4,18 @@
 #include <pcap.h>
 #include "paquete.h"
 
+#define DEVICE_LENGTH 16 /* tamaño maximo del nombre de la interfaz */
+
+/*
+ * struct config
+ * -------------------------------------------------------------------------
+ *  Sirve para almacenar la configuracion del programa
+ */
+struct config {
+    char device[DEVICE_LENGTH];
+    enum dir direccion;
+};
+
 /**
  * captura_inicio()
  * --------------------------------------------------------------------------

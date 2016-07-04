@@ -11,7 +11,6 @@
 #include "paquete.h"
 
 #define FILTER_INBOUND "inbound and (tcp or udp)"
-#define FILTER_OUTBOUND "outbound and (tcp or udp)"
 
 /**
 * UNUSED(x)
