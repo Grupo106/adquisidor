@@ -14,18 +14,6 @@
  */
 void print_sqlca();
 
-EXEC SQL BEGIN DECLARE SECTION;
-    int _src,
-        _dst,
-        _sport,
-        _dport,
-        _bytes,
-        _protocol;
-    const char *_insert_stmt =
-    "INSERT INTO paquetes (ip_origen, ip_destino, puerto_origen, \
-                           puerto_destino, bytes, protocolo) \
-     VALUES(?, ?, ?, ?, ?, ?);";
-EXEC SQL END DECLARE SECTION;
 
 EXEC SQL WHENEVER SQLERROR CALL print_sqlca();
 EXEC SQL WHENEVER SQLWARNING SQLPRINT;
@@ -80,6 +68,18 @@ void bd_desconectar() {
  */
 void bd_insertar(struct paquete *paquete) {
     assert(paquete != NULL);
+    EXEC SQL BEGIN DECLARE SECTION;
+        int _src,
+            _dst,
+            _sport,
+            _dport,
+            _bytes,
+            _protocol;
+        const char *_insert_stmt =
+        "INSERT INTO paquetes (ip_origen, ip_destino, puerto_origen, \
+                               puerto_destino, bytes, protocolo) \
+         VALUES(?, ?, ?, ?, ?, ?);";
+    EXEC SQL END DECLARE SECTION;
     /* Preparo sentencia insert */
     EXEC SQL PREPARE _insert FROM :_insert_stmt;
     /* Preparo parametros */

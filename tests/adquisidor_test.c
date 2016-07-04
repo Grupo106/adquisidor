@@ -9,6 +9,11 @@
 #include <netinet/udp.h>
 #include <netinet/tcp.h>
 
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
+#include <cmocka.h>
+
 #include "adquisidor_test.h"
 #include "adquisidor.h"
 #include "paquete.h"
