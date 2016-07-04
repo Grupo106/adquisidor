@@ -1,4 +1,5 @@
 [![GitHub tag](https://img.shields.io/github/tag/Grupo106/adquisidor.svg?maxAge=2592000?style=plastic)](https://github.com/Grupo106/adquisidor/releases)
+[![Build Status](https://travis-ci.org/Grupo106/adquisidor.svg?branch=master)](https://travis-ci.org/Grupo106/adquisidor)
 
 adquisidor
 ======================================================
