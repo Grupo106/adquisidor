@@ -162,12 +162,14 @@ static int argumentos(int argc, const char* argv[], struct config *cfg) {
      */
     if (argc > 1) {
         /* si el primer parametro es -h o --help muestro mensaje de ayuda*/
-        if(strcmp(argv[1], "-h") == 0|| strcmp(argv[1], "--help") == 0) {
+        if(strncmp(argv[1], "-h", 2) == 0 || 
+                strncmp(argv[1], "--help", 6) == 0) {
             ayuda();
             exit(EXIT_SUCCESS);
         }
         /* si el primer parametro es -v o --verson muestro version */
-        if(strcmp(argv[1], "-v") == 0|| strcmp(argv[1], "--version") == 0) {
+        if(strncmp(argv[1], "-v", 2) == 0 ||
+                strncmp(argv[1], "--version", 10) == 0) {
             printf("%s - %s - %s\n", PROGRAM, REVISION, BUILD_MODE);
             exit(EXIT_SUCCESS);
         }
