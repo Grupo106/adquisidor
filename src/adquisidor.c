@@ -23,7 +23,7 @@
 static pcap_t *__handle; /* Puntero necesario para capturar */
 static struct bpf_program __fp; /* Puntero necesario para capturar */
 static int __cantidad = 0; /* Cantidad de paquetes capturados */
-static const struct config *__cfg; /* Puntero hacia la configuracion */
+static struct config *__cfg = NULL; /* Puntero hacia la configuracion */
 
 /*
 * procesar_paquete
@@ -69,7 +69,8 @@ void procesar_paquete(u_char *args,
     paquete.origen = p_ip->ip_src;
     paquete.destino = p_ip->ip_dst;
     paquete.bytes = ntohs(p_ip->ip_len);
-    paquete.direccion = __cfg->direccion;
+    if(__cfg)
+        paquete.direccion = __cfg->direccion;
 
     /* Obtengo informacion de la capa de transporte */
     if (p_ip->ip_p == IPPROTO_TCP) {
@@ -121,7 +122,7 @@ void procesar_udp(const u_char *udp, struct paquete *paquete) {
 * Captura, procesa y guarda información de los paquetes que atraviesan una
 * interfaz en la base de datos.
 */
-void captura_inicio(const struct config *cfg) {
+void captura_inicio(struct config *cfg) {
     char dev[DEVICE_LENGTH];
     char errbuf[PCAP_ERRBUF_SIZE];
     __cfg = cfg;

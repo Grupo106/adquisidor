@@ -141,4 +141,4 @@ $(BUILD_PATH)/%.o: $(SRC_DIR)/%.pgc
 # ---------------------------------------------------------------------------
 $(BIN_PATH)/$(PROGRAM): $(OBJECTS)
 	@echo "Construyendo $@"
-	@$(CC) $(LINK_FLAGS) -o $@ $(OBJECTS)
+	@$(CC) -o $@ $(OBJECTS) $(LINK_FLAGS) 
