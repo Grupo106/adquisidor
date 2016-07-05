@@ -50,4 +50,5 @@ static void test_paquete_tcp() {
 int main(void) {
     test_paquete_tcp();
     printf("SUCCESS\n");
+    return 0;
 }
