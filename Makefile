@@ -14,7 +14,7 @@ BUILD_DIR := build
 # * carpeta donde se crearan los binararios
 BIN_DIR := bin
 # * carpeta donde se instalarán los binarios productivos
-INSTALL_DIR := /usr/local/sbin
+INSTALL_DIR := /usr/local/bin
 # * carpeta dentro de BIN_DIR y BUILD_DIR donde se almacenaran los binarios
 # productivos
 RELEASE_DIR := release
@@ -110,6 +110,7 @@ clean: banner
 # Instala binarios en el host (requiere privilegios de root)
 install: banner
 	install $(BIN_DIR)/$(RELEASE_DIR)/$(PROGRAM) $(INSTALL_DIR)
+	setcap cap_net_raw+ep $(INSTALL_DIR)/$(PROGRAM)
 	@echo "$(PROGRAM) instalado correctamente"
 
 # Desinstala binarios en el host (requiere privilegios de root)
