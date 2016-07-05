@@ -31,7 +31,7 @@ int __wrap_bd_commit() {
 }
 
 static void test_paquete_tcp() {
-    char packet[255];
+    unsigned char packet[255];
     struct ip *capa3;
     struct tcphdr *capa4;
     capa3 = (struct ip*)(packet + ETH_HLEN);
