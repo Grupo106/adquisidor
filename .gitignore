@@ -37,3 +37,7 @@
 # generated objects
 bin/
 build/
+
+*.gcda
+*.gcno
+
