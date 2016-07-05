@@ -21,6 +21,8 @@
 #define BUILD_MODE "produccion"
 #endif /* BUILD_MODE */
 
+#define ARGV_LENGHT 16 /* tamaño maximo de cadenas pasadas por parametro */
+
 /**
  * terminar()
  * ---------------------------------------------------------------------------
@@ -162,14 +164,14 @@ static int argumentos(int argc, const char* argv[], struct config *cfg) {
      */
     if (argc > 1) {
         /* si el primer parametro es -h o --help muestro mensaje de ayuda*/
-        if(strncmp(argv[1], "-h", 2) == 0 || 
-                strncmp(argv[1], "--help", 6) == 0) {
+        if(strncmp(argv[1], "-h", ARGV_LENGHT) == 0 || 
+                strncmp(argv[1], "--help", ARGV_LENGHT) == 0) {
             ayuda();
             exit(EXIT_SUCCESS);
         }
         /* si el primer parametro es -v o --verson muestro version */
-        if(strncmp(argv[1], "-v", 2) == 0 ||
-                strncmp(argv[1], "--version", 10) == 0) {
+        if(strncmp(argv[1], "-v", ARGV_LENGHT) == 0 ||
+                strncmp(argv[1], "--version", ARGV_LENGHT) == 0) {
             printf("%s - %s - %s\n", PROGRAM, REVISION, BUILD_MODE);
             exit(EXIT_SUCCESS);
         }
@@ -178,9 +180,9 @@ static int argumentos(int argc, const char* argv[], struct config *cfg) {
     }
     /* seteo la direccion de los paquetes */
     if(argc == 3) {
-        if (strcmp(argv[2], "inbound") == 0) {
+        if (strncmp(argv[2], "inbound", ARGV_LENGHT) == 0) {
             cfg->direccion = INBOUND;
-        } else if (strcmp(argv[2], "outbound") == 0) {
+        } else if (strncmp(argv[2], "outbound", ARGV_LENGHT) == 0) {
             cfg->direccion = OUTBOUND;
         } else {
             fprintf(stderr, "%s: Parámetro desconocido\n", argv[2]);
