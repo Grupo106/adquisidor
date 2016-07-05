@@ -4,7 +4,7 @@ TEST_SRC=tests
 SRC=src
 
 mkdir -p $TEST_PATH
-gcc -v -lpcap -g -Wl,--wrap=bd_insertar,--wrap=bd_commit \
-    -o $TEST_PATH/test_adquisidor $SRC/adquisidor.c $TEST_SRC/test_adquisidor.c
+gcc  -g -Wl,--wrap=bd_insertar,--wrap=bd_commit -o $TEST_PATH/test_adquisidor \
+     $SRC/adquisidor.c $TEST_SRC/test_adquisidor.c -lpcap
 
 $TEST_PATH/test_adquisidor
