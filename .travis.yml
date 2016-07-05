@@ -8,3 +8,7 @@ install:
 script: 
   - make
   - ./run_tests.sh
+  - gcov adquisidor.c
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
