@@ -3,9 +3,11 @@
 #include <string.h>
 #include <signal.h>
 #include <syslog.h>
+#include <unistd.h>
 
 #include "adquisidor.h"
 #include "db.h"
+#include "ini.h"
 
 #ifndef REVISION
 #define REVISION "DESCONOCIDA"
@@ -15,6 +17,10 @@
 #define PROGRAM "adquisidor"
 #endif /* PROGRAM */
 
+#ifndef COPYLEFT
+#define COPYLEFT "(c) Netcop 2016 - Universidad Nacional de la Matanza"
+#endif /* PROGRAM */
+
 #ifdef DEBUG
 #define BUILD_MODE "desarrollo"
 #else
@@ -22,6 +28,11 @@
 #endif /* BUILD_MODE */
 
 #define ARGV_LENGHT 16 /* tamaño maximo de cadenas pasadas por parametro */
+
+typedef struct {
+    char outside[DEVICE_LENGTH];
+    char inside[DEVICE_LENGTH];
+} ini_config;
 
 /**
  * terminar()
@@ -53,7 +64,17 @@ static void banner();
  *  caso de exito, cualquier otro numero en caso de error
  * 
  */
-static int argumentos(int argc, const char* argv[], struct config *cfg);
+static void argumentos(int argc, const char* argv[], struct config *cfg);
+
+/*
+ * configuracion_ini
+ * ---------------------------------------------------------------------------
+ *  Lee la configuracion del modulo desde el archivo pasado por parametro.
+ *
+ *  Además crea dos procesos, uno para escuchar en la interfaz inside y otro
+ *  para escuchar en la interfaz outside
+ */
+static void configuracion_ini(const char*, struct config *cfg);
 
 int main(int argc, const char* argv[]) {
     struct config cfg;
@@ -64,7 +85,10 @@ int main(int argc, const char* argv[]) {
     /* Imprimo banner con version */
     banner();
     /* muestro informacion del build */
-    syslog(LOG_INFO, "Revision: %s (%s)", REVISION, BUILD_MODE);
+    syslog(LOG_INFO, "Revision: %s (%s) interfaz=%s direccion=%s", 
+           REVISION, BUILD_MODE, 
+           *(cfg.device) ? cfg.device : "DEFAULT" ,
+           cfg.direccion == INBOUND ? "INBOUND" : "OUTBOUND");
     /* conecto base de datos */
     int sqlret = bd_conectar();
     if(sqlret != 0)
@@ -110,12 +134,10 @@ static void manejar_interrupciones() {
  * Imprime banner con version del programa
  */
 static void banner() {
-    printf("\
----------------------------------------------------------------------------\n\
-Netcop - Universidad Nacional de La Matanza. 2016\n\
-%s - Revision: %s (%s)\n\
----------------------------------------------------------------------------\n",
-    PROGRAM, REVISION, BUILD_MODE);
+    printf("---------------------------------------------------------------\n"
+           "%s - Revision: %s (%s)\n%s\n"
+           "---------------------------------------------------------------\n",
+           PROGRAM, REVISION, BUILD_MODE, COPYLEFT);
 }
 
 /*
@@ -124,29 +146,25 @@ Netcop - Universidad Nacional de La Matanza. 2016\n\
  *  Muestra mensaje de ayuda
  */
 static void ayuda() {
-    printf("\
-Este programa captura los paquetes ENTRANTES de la interfaz pasada por\n\
-parámetro. Si ninguna interfaz es establecida, se capturará en la primer\n\
-interfaz disponible.\n\
-\n\
-Uso: %s -h | -v \n\
-     %s device outbound|inbound \n\
-\n\
--h --help     Muestra esta ayuda.\n\
-\n\
--v --version  Muestra numero de version.\n\
-\n\
-device        Nombre de la interfaz en la que se capturarán los paquetes\n\
-              entrantes\n\
-\n\
-outbound      Asume que los paquetes son desde la LAN hacia internet (por \n\
-              defecto). Solo es util para el analizador\n\
-\n\
-inbound       Asume que los paquetes son desde Internet hacia la LAN. Solo\n\
-              es útl para el analizador.\n\
-\n\
-(c) Netcop. 2016\
-\n", PROGRAM, PROGRAM);
+    printf("Uso: %s -h | -v | --config filename.ini\n"
+           "     %s device [outbound|inbound]\n\n"
+           "Este programa captura los paquetes ENTRANTES de la interfaz pasada "
+           "por parámetro.\nSi ninguna interfaz es establecida, se capturará "
+           "en la primer interfaz disponible.\n"
+           "\n"
+           "-h, --help             Muestra esta ayuda.\n"
+           "-v, --version          Muestra numero de version.\n"
+           "--config filename.ini  Lee configuración desde archivo INI.\n"
+           "device                 Nombre de la interfaz en la que se"
+                                   " capturarán los paquetes entrantes.\n"
+           "outbound               Asume que los paquetes son desde la LAN"
+                                   " hacia internet. Solo es util para el"
+                                   " analizador\n"
+           "inbound                Asume que los paquetes son desde Internet"
+                                   " hacia la LAN. Solo es útl para el"
+                                   " analizador.\n"
+           "%s\n"
+           , PROGRAM, PROGRAM, COPYLEFT);
 }
 
 /*
@@ -156,9 +174,9 @@ inbound       Asume que los paquetes son desde Internet hacia la LAN. Solo\n\
  *  caso de exito, cualquier otro numero en caso de error.  Sin argumentos, no
  *  especifica ninguna interfaz
  */
-static int argumentos(int argc, const char* argv[], struct config *cfg) {
+static void argumentos(int argc, const char* argv[], struct config *cfg) {
     *(cfg->device) = '\0';
-    cfg->direccion = OUTBOUND;
+    cfg->direccion = INBOUND;
     /* mas de un argumento, el primero especifica la interfaz, el resto lo
      * ignoro
      */
@@ -175,6 +193,14 @@ static int argumentos(int argc, const char* argv[], struct config *cfg) {
             printf("%s - %s - %s\n", PROGRAM, REVISION, BUILD_MODE);
             exit(EXIT_SUCCESS);
         }
+        /* si el primer parametro es --config leo configuracion desde archivo*/
+        if(strncmp(argv[1], "--config", ARGV_LENGHT) == 0) {
+            if (argc < 3) { /* falta nombre de archivo */
+                fprintf(stderr, "Falta nombre de archivo\n"); 
+                exit(EXIT_FAILURE);
+            } /* fin mensaje error */
+            return configuracion_ini(argv[2], cfg);
+        }
         /* seteo la interfaz a escuchar */
         strncpy(cfg->device, argv[1], DEVICE_LENGTH);
     }
@@ -189,5 +215,47 @@ static int argumentos(int argc, const char* argv[], struct config *cfg) {
             exit(EXIT_FAILURE);
         }
     }
-    return 0;
+}
+
+static int handler(void* user, const char* section, const char* name,
+                   const char* value)
+{
+    ini_config *pconfig = (ini_config*) user;
+
+    #define MATCH(s, n) strncmp(section, s, DEVICE_LENGTH) == 0 && \
+                        strncmp(name, n, DEVICE_LENGTH) == 0
+    if (MATCH("adquisidor", "outside")) {
+        strncpy(pconfig->outside, value, DEVICE_LENGTH);
+    } else if (MATCH("adquisidor", "inside")) {
+        strncpy(pconfig->inside, value, DEVICE_LENGTH);
+    }
+    return 1;
+}
+
+static void configuracion_ini(const char *filename, struct config *cfg) {
+    ini_config ini_config;
+    pid_t pid;
+
+    if (ini_parse(filename, handler, &ini_config) < 0) {
+        fprintf(stderr, "No se pudo abrir el archivo '%s'\n", filename);
+        syslog(LOG_ERR, "No se pudo abrir el archivo '%s'", filename);
+        exit(EXIT_FAILURE);
+    }
+
+    syslog(LOG_INFO, "Configuración cargada desde archivo '%s': "
+                      "outside=%s inside=%s", 
+            filename, ini_config.inside, ini_config.outside);
+    
+    pid = fork();
+    if (pid == 0) {
+        /* si es el proceso hijo, escuchara en la interfaz inside */
+        strncpy(cfg->device, ini_config.inside, DEVICE_LENGTH);
+        cfg->direccion = OUTBOUND;
+    } /* fin proceso hijo */
+
+    else {
+        /* si es el proceso padre, escuchara en la interfaz outside */
+        strncpy(cfg->device, ini_config.outside, DEVICE_LENGTH);
+        cfg->direccion = INBOUND;
+    } /* fin proceso padre */
 }
