@@ -72,7 +72,8 @@ static void argumentos(int argc, const char* argv[], struct config *cfg);
  *  Lee la configuracion del modulo desde el archivo pasado por parametro.
  *
  *  Además crea dos procesos, uno para escuchar en la interfaz inside y otro
- *  para escuchar en la interfaz outside
+ *  para escuchar en la interfaz outside. El proceso padre escuchara en outside
+ *  y el hijo en inside
  */
 static void configuracion_ini(const char*, struct config *cfg);
 
@@ -180,11 +181,9 @@ static void ayuda() {
  *  especifica ninguna interfaz
  */
 static void argumentos(int argc, const char* argv[], struct config *cfg) {
+    /* establezco valores por defecto */
     *(cfg->device) = '\0';
     cfg->direccion = ENTRANTE;
-    /* mas de un argumento, el primero especifica la interfaz, el resto lo
-     * ignoro
-     */
     if (argc > 1) {
         /* si el primer parametro es -h o --help muestro mensaje de ayuda*/
         if(strncmp(argv[1], "-h", ARGV_LENGHT) == 0 || 
@@ -192,12 +191,14 @@ static void argumentos(int argc, const char* argv[], struct config *cfg) {
             ayuda();
             exit(EXIT_SUCCESS);
         }
+
         /* si el primer parametro es -v o --verson muestro version */
         if(strncmp(argv[1], "-v", ARGV_LENGHT) == 0 ||
                 strncmp(argv[1], "--version", ARGV_LENGHT) == 0) {
             printf("%s - %s - %s\n", PROGRAM, REVISION, BUILD_MODE);
             exit(EXIT_SUCCESS);
         }
+
         /* si el primer parametro es --config leo configuracion desde archivo*/
         if(strncmp(argv[1], "--config", ARGV_LENGHT) == 0) {
             if (argc < 3) { /* falta nombre de archivo */
@@ -206,21 +207,33 @@ static void argumentos(int argc, const char* argv[], struct config *cfg) {
             } /* fin mensaje error */
             return configuracion_ini(argv[2], cfg);
         }
+
         /* seteo la interfaz a escuchar */
         strncpy(cfg->device, argv[1], DEVICE_LENGTH);
-    }
-    /* seteo la direccion de los paquetes */
-    if(argc == 3) {
-        if (strncmp(argv[2], "entrante", ARGV_LENGHT) == 0) {
-            cfg->direccion = ENTRANTE;
-        } else if (strncmp(argv[2], "saliente", ARGV_LENGHT) == 0) {
-            cfg->direccion = SALIENTE;
-        } else {
-            fprintf(stderr, "%s: Parámetro desconocido\n", argv[2]);
-            exit(EXIT_FAILURE);
+
+        /* seteo la direccion de los paquetes */
+        if(argc == 3) {
+            if (strncmp(argv[2], "entrante", ARGV_LENGHT) == 0) {
+                cfg->direccion = ENTRANTE;
+            } else if (strncmp(argv[2], "saliente", ARGV_LENGHT) == 0) {
+                cfg->direccion = SALIENTE;
+            } else {
+                fprintf(stderr, "%s: Parámetro desconocido\n", argv[2]);
+                exit(EXIT_FAILURE);
+            }
         }
     }
+
 }
+
+/*
+ * handler()
+ * --------------------------------------------------------------------------
+ *  Esta funcion es llamada cada vez que se reconoce un patron clave=valor en
+ *  el archivo INI.
+ *
+ *  Se encarga de armar la estructura de configuracion del modulo.
+ */
 
 static int handler(void* user, const char* section, const char* name,
                    const char* value)
@@ -237,6 +250,15 @@ static int handler(void* user, const char* section, const char* name,
     return 1;
 }
 
+/*
+ * configuracion_ini
+ * ---------------------------------------------------------------------------
+ *  Lee la configuracion del modulo desde el archivo pasado por parametro.
+ *
+ *  Además crea dos procesos, uno para escuchar en la interfaz inside y otro
+ *  para escuchar en la interfaz outside. El proceso padre escuchara en outside
+ *  y el hijo en inside
+ */
 static void configuracion_ini(const char *filename, struct config *cfg) {
     ini_config ini_config;
     pid_t pid;
