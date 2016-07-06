@@ -36,7 +36,7 @@ void imprimir(struct paquete *paquete) {
            dst,
            paquete->puerto_destino,
            paquete->bytes,
-           paquete->direccion == OUTBOUND ? "outbound" : "inbound");
+           paquete->direccion == SALIENTE ? "saliente(1)" : "entrante(0)");
 }
 
 /**

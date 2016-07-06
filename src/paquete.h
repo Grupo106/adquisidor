@@ -4,8 +4,8 @@
 #include <arpa/inet.h>
 
 enum dir {
-    INBOUND = 0,
-    OUTBOUND = 1
+    ENTRANTE = 0,
+    SALIENTE = 1
 };
 
 /**
@@ -21,8 +21,8 @@ struct paquete {
     u_int16_t puerto_destino; /* puerto de destino */
     int bytes; /* cantidad de bytes que contiene el paquete */
     int protocolo; /* protocolo (6 es TCP y 17 es UDP) */
-    enum dir direccion; /* direccion del paquete (puede ser INBOUND o
-                         * OUTBOUND)
+    enum dir direccion; /* direccion del paquete (puede ser ENTRANTE o
+                         * SALIENTE)
                          */
 };
 

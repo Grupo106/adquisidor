@@ -55,7 +55,7 @@ static void manejar_interrupciones();
  * ---------------------------------------------------------------------------
  * Imprime banner con version del programa
  */
-static void banner();
+static void banner(struct config*);
 
 /*
  * argumentos()
@@ -80,15 +80,15 @@ int main(int argc, const char* argv[]) {
     struct config cfg;
     /* Inicializo logs */
     openlog(PROGRAM, LOG_CONS | LOG_PID, LOG_LOCAL0);
-    /* Parseo argumentos */
+    /* Parseo argumentos para obtener la configuracion del modulo */
     argumentos(argc, argv, &cfg);
     /* Imprimo banner con version */
-    banner();
+    banner(&cfg);
     /* muestro informacion del build */
     syslog(LOG_INFO, "Revision: %s (%s) interfaz=%s direccion=%s", 
            REVISION, BUILD_MODE, 
            *(cfg.device) ? cfg.device : "DEFAULT" ,
-           cfg.direccion == INBOUND ? "INBOUND" : "OUTBOUND");
+           cfg.direccion == ENTRANTE ? "entrante(0)" : "saliente(1)");
     /* conecto base de datos */
     int sqlret = bd_conectar();
     if(sqlret != 0)
@@ -133,11 +133,16 @@ static void manejar_interrupciones() {
  * ---------------------------------------------------------------------------
  * Imprime banner con version del programa
  */
-static void banner() {
+static void banner(struct config *cfg) {
     printf("---------------------------------------------------------------\n"
-           "%s - Revision: %s (%s)\n%s\n"
+           "%s\n"
+           "%s - Revision: %s (%s)\n"
+           "Interfaz: %s Direccion: %s\n"
            "---------------------------------------------------------------\n",
-           PROGRAM, REVISION, BUILD_MODE, COPYLEFT);
+           COPYLEFT,
+           PROGRAM, REVISION, BUILD_MODE,
+           *(cfg->device) ? cfg->device : "DEFAULT" ,
+           cfg->direccion == ENTRANTE ? "entrante(0)" : "saliente(1)");
 }
 
 /*
@@ -147,7 +152,7 @@ static void banner() {
  */
 static void ayuda() {
     printf("Uso: %s -h | -v | --config filename.ini\n"
-           "     %s device [outbound|inbound]\n\n"
+           "     %s interfaz [saliente|entrante]\n\n"
            "Este programa captura los paquetes ENTRANTES de la interfaz pasada "
            "por parámetro.\nSi ninguna interfaz es establecida, se capturará "
            "en la primer interfaz disponible.\n"
@@ -155,12 +160,12 @@ static void ayuda() {
            "-h, --help             Muestra esta ayuda.\n"
            "-v, --version          Muestra numero de version.\n"
            "--config filename.ini  Lee configuración desde archivo INI.\n"
-           "device                 Nombre de la interfaz en la que se"
+           "interfaz               Nombre de la interfaz en la que se"
                                    " capturarán los paquetes entrantes.\n"
-           "outbound               Asume que los paquetes son desde la LAN"
+           "saliente               Asume que los paquetes son desde la LAN"
                                    " hacia internet. Solo es util para el"
                                    " analizador\n"
-           "inbound                Asume que los paquetes son desde Internet"
+           "entrante               Asume que los paquetes son desde Internet"
                                    " hacia la LAN. Solo es útl para el"
                                    " analizador.\n"
            "%s\n"
@@ -176,7 +181,7 @@ static void ayuda() {
  */
 static void argumentos(int argc, const char* argv[], struct config *cfg) {
     *(cfg->device) = '\0';
-    cfg->direccion = INBOUND;
+    cfg->direccion = ENTRANTE;
     /* mas de un argumento, el primero especifica la interfaz, el resto lo
      * ignoro
      */
@@ -206,10 +211,10 @@ static void argumentos(int argc, const char* argv[], struct config *cfg) {
     }
     /* seteo la direccion de los paquetes */
     if(argc == 3) {
-        if (strncmp(argv[2], "inbound", ARGV_LENGHT) == 0) {
-            cfg->direccion = INBOUND;
-        } else if (strncmp(argv[2], "outbound", ARGV_LENGHT) == 0) {
-            cfg->direccion = OUTBOUND;
+        if (strncmp(argv[2], "entrante", ARGV_LENGHT) == 0) {
+            cfg->direccion = ENTRANTE;
+        } else if (strncmp(argv[2], "saliente", ARGV_LENGHT) == 0) {
+            cfg->direccion = SALIENTE;
         } else {
             fprintf(stderr, "%s: Parámetro desconocido\n", argv[2]);
             exit(EXIT_FAILURE);
@@ -250,12 +255,12 @@ static void configuracion_ini(const char *filename, struct config *cfg) {
     if (pid == 0) {
         /* si es el proceso hijo, escuchara en la interfaz inside */
         strncpy(cfg->device, ini_config.inside, DEVICE_LENGTH);
-        cfg->direccion = OUTBOUND;
+        cfg->direccion = SALIENTE;
     } /* fin proceso hijo */
 
     else {
         /* si es el proceso padre, escuchara en la interfaz outside */
         strncpy(cfg->device, ini_config.outside, DEVICE_LENGTH);
-        cfg->direccion = INBOUND;
+        cfg->direccion = ENTRANTE;
     } /* fin proceso padre */
 }
