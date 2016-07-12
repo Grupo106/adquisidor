@@ -78,9 +78,9 @@ void bd_insertar(struct paquete *paquete) {
         int _protocol;
         int _dir;
         const char *_insert_stmt =
-        "INSERT INTO paquetes (ip_origen, ip_destino, puerto_origen, \
-                               puerto_destino, bytes, protocolo, direccion) \
-         VALUES(?, ?, ?, ?, ?, ?, ?);";
+        "INSERT INTO paquetes (ip_origen, ip_destino, puerto_origen,"
+        "                      puerto_destino, bytes, protocolo, direccion) "
+        "VALUES(?, ?, ?, ?, ?, ?, ?);";
     EXEC SQL END DECLARE SECTION;
     assert(paquete != NULL);
     /* Preparo sentencia insert */
@@ -94,9 +94,9 @@ void bd_insertar(struct paquete *paquete) {
     _protocol = paquete->protocolo;
     _dir = paquete->direccion;
     /* Ejecuto sentencia */
-    EXEC SQL EXECUTE _insert USING :_src, 
-                                   :_dst, 
-                                   :_sport, 
+    EXEC SQL EXECUTE _insert USING :_src,
+                                   :_dst,
+                                   :_sport,
                                    :_dport,
                                    :_bytes,
                                    :_protocol,
