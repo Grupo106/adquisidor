@@ -66,8 +66,8 @@ void procesar_paquete(u_char *args,
     /* Obtengo direccion ip de origen, destino, la cantidad de bytes total del
      * paquete ip y la direccion del paquete
      */
-    paquete.origen = p_ip->ip_src;
-    paquete.destino = p_ip->ip_dst;
+    paquete.ip_origen = p_ip->ip_src;
+    paquete.ip_destino = p_ip->ip_dst;
     paquete.bytes = ntohs(p_ip->ip_len);
     if(__cfg)
         paquete.direccion = __cfg->direccion;

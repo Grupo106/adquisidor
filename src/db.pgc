@@ -27,8 +27,8 @@ EXEC SQL WHENEVER SQLWARNING SQLPRINT;
 void imprimir(struct paquete *paquete) {
     // imprimir paquete
     char src[INET_ADDRSTRLEN], dst[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &(paquete->origen), src, INET_ADDRSTRLEN);
-    inet_ntop(AF_INET, &(paquete->destino), dst, INET_ADDRSTRLEN);
+    inet_ntop(AF_INET, &(paquete->ip_origen), src, INET_ADDRSTRLEN);
+    inet_ntop(AF_INET, &(paquete->ip_destino), dst, INET_ADDRSTRLEN);
     printf("%s - %15s:%-5d -> %15s:%-5d - %d bytes - %s\n",
            paquete->protocolo == 6 ? "TCP" : "UDP",
            src,
@@ -86,8 +86,8 @@ void bd_insertar(struct paquete *paquete) {
     /* Preparo sentencia insert */
     EXEC SQL PREPARE _insert FROM :_insert_stmt;
     /* Preparo parametros */
-    _src = ntohl(paquete->origen.s_addr);
-    _dst = ntohl(paquete->destino.s_addr);
+    _src = ntohl(paquete->ip_origen.s_addr);
+    _dst = ntohl(paquete->ip_destino.s_addr);
     _sport = paquete->puerto_origen;
     _dport = paquete->puerto_destino;
     _bytes = paquete->bytes;

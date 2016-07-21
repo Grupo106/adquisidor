@@ -17,8 +17,8 @@
 #include "../src/paquete.h"
 
 int __wrap_bd_insertar(struct paquete *paquete) {
-    assert(paquete->origen.s_addr == inet_addr("192.168.10.1"));
-    assert(paquete->destino.s_addr == inet_addr("200.67.222.222"));
+    assert(paquete->ip_origen.s_addr == inet_addr("192.168.10.1"));
+    assert(paquete->ip_destino.s_addr == inet_addr("200.67.222.222"));
     assert(paquete->puerto_origen == 23412);
     assert(paquete->puerto_destino == 80);
     assert(paquete->bytes == 1500);
