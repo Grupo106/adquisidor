@@ -242,9 +242,9 @@ static int handler(void* user, const char* section, const char* name,
 
     #define MATCH(s, n) strncmp(section, s, DEVICE_LENGTH) == 0 && \
                         strncmp(name, n, DEVICE_LENGTH) == 0
-    if (MATCH("adquisidor", "outside")) {
+    if (MATCH("netcop", "outside")) {
         strncpy(pconfig->outside, value, DEVICE_LENGTH);
-    } else if (MATCH("adquisidor", "inside")) {
+    } else if (MATCH("netcop", "inside")) {
         strncpy(pconfig->inside, value, DEVICE_LENGTH);
     }
     return 1;
