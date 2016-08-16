@@ -42,7 +42,23 @@ make
 sudo make install
 ```
 
-**Atención**: Para la ejecución necesita privilegios de administrador (root)
+Uso
+-------------------------------------------------------
+```
+Uso: adquisidor -h | -v | --config filename.ini
+     adquisidor interfaz [saliente|entrante]
+
+Este programa captura los paquetes ENTRANTES de la interfaz pasada por parámetro.
+Si ninguna interfaz es establecida, se capturará en la primer interfaz disponible.
+
+-h, --help             Muestra esta ayuda.
+-v, --version          Muestra numero de version.
+--config filename.ini  Lee configuración desde archivo INI.
+interfaz               Nombre de la interfaz en la que se capturarán los paquetes entrantes.
+saliente               Asume que los paquetes son desde la LAN hacia internet. Solo es util para el analizador
+entrante               Asume que los paquetes son desde Internet hacia la LAN. Solo es útl para el analizador.
+(c) Netcop 2016 - Universidad Nacional de la Matanza
+```
 
 Ver logs
 -------------------------------------------------------
