@@ -55,8 +55,10 @@ Si ninguna interfaz es establecida, se capturará en la primer interfaz disponib
 -v, --version          Muestra numero de version.
 --config filename.ini  Lee configuración desde archivo INI.
 interfaz               Nombre de la interfaz en la que se capturarán los paquetes entrantes.
-saliente               Asume que los paquetes son desde la LAN hacia internet. Solo es util para el analizador
-entrante               Asume que los paquetes son desde Internet hacia la LAN. Solo es útl para el analizador.
+saliente               Asume que los paquetes son desde la LAN hacia internet. 
+                       Solo es util para el analizador
+entrante               Asume que los paquetes son desde Internet hacia la LAN. 
+                       Solo es útl para el analizador.
 (c) Netcop 2016 - Universidad Nacional de la Matanza
 ```
 
